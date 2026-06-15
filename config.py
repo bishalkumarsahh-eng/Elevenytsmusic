@@ -3,7 +3,7 @@
 # All Rights Reserved.
 #
 # Project      : ArtistBots API Telegram Music Bot
-# Powered By   : Artist
+# Powered By   : Artist 
 # Type         : API Based Telegram Music Bot
 #
 # Bot          : @ArtistApibot
