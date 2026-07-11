@@ -9,6 +9,10 @@ from typing import Dict, List, Tuple
 from collections import defaultdict
 
 from pyrogram import filters, types
+import pymongo
+import asyncio
+
+from Elevenyts import config, tasks, db
 
 from Elevenyts import app
 
@@ -18,6 +22,81 @@ AFK_HEADER = "❖ ⎯꯭̽🦚⤹‌⋆‌‌‌‌𝅃͢𝐓𝛋֟͡‌‌‌�
 
 # How many seconds to wait before sending another AFK auto-reply to the same sender
 DEFAULT_REPLY_COOLDOWN = 300  # 5 minutes
+MONGO_AFK_COLLECTION = None
+MONGO_AFK_SETTINGS = None
+
+
+def _init_mongo_collections():
+    global MONGO_AFK_COLLECTION, MONGO_AFK_SETTINGS
+    try:
+        client = pymongo.MongoClient(config.MONGO_URL, serverSelectionTimeoutMS=5000)
+        dbname = client.get_default_database().name if client.get_default_database() else "elevenyts"
+        coll = client[dbname]
+        MONGO_AFK_COLLECTION = coll["afk_entries"]
+        MONGO_AFK_SETTINGS = coll["afk_settings"]
+    except Exception:
+        MONGO_AFK_COLLECTION = None
+        MONGO_AFK_SETTINGS = None
+
+
+def _persist_afk(user_id: int, data: Dict[str, object]):
+    """Persist AFK entry to MongoDB (best-effort)."""
+    if not MONGO_AFK_COLLECTION:
+        return
+    try:
+        MONGO_AFK_COLLECTION.update_one({"user_id": user_id}, {"$set": data}, upsert=True)
+    except Exception:
+        return
+
+
+def _remove_afk_persist(user_id: int):
+    if not MONGO_AFK_COLLECTION:
+        return
+    try:
+        MONGO_AFK_COLLECTION.delete_one({"user_id": user_id})
+    except Exception:
+        return
+
+
+async def _load_persisted_afk():
+    if not MONGO_AFK_COLLECTION:
+        return
+    try:
+        for doc in MONGO_AFK_COLLECTION.find({}):
+            uid = int(doc.get("user_id"))
+            AFK_USERS[uid] = doc.get("data", {})
+    except Exception:
+        return
+
+
+async def _afk_expiry_worker():
+    """Background task to expire timed AFK entries and optionally notify users."""
+    while True:
+        now = time.time()
+        expired = []
+        for uid, state in list(AFK_USERS.items()):
+            until = state.get("until")
+            if until and now > until:
+                expired.append((uid, state))
+
+        for uid, state in expired:
+            # Remove and persist removal
+            AFK_USERS.pop(uid, None)
+            AFK_MENTIONS.pop(uid, None)
+            _remove_afk_persist(uid)
+            # Try to DM the user to notify them their AFK expired
+            try:
+                # best-effort; user may not have started bot
+                await app.send_message(uid, "Your AFK period has ended and AFK status was cleared.")
+            except Exception:
+                pass
+
+        await asyncio.sleep(60)
+
+
+# initialize mongo collections at import time (best-effort)
+_init_mongo_collections()
+tasks.append(asyncio.create_task(_afk_expiry_worker()))
 
 
 def _parse_duration_token(token: str) -> int:
@@ -38,6 +117,28 @@ def _parse_duration_token(token: str) -> int:
     if unit == "d":
         return value * 86400
     return 0
+
+
+def _parse_kv_tokens(tokens: List[str]) -> Dict[str, object]:
+    """Parse tokens like 'cd=30s' or 'msg=Busy' or 'scope=chat' into a dict."""
+    out = {}
+    for t in tokens:
+        if "=" in t:
+            k, v = t.split("=", 1)
+            out[k.lower()] = v
+    return out
+
+
+def _chat_opted_out(chat_id: int) -> bool:
+    if not MONGO_AFK_SETTINGS:
+        return False
+    try:
+        doc = MONGO_AFK_SETTINGS.find_one({"chat_id": chat_id})
+        if not doc:
+            return False
+        return bool(doc.get("disabled", False))
+    except Exception:
+        return False
 
 
 def _format_duration(seconds: int) -> str:
@@ -98,16 +199,34 @@ async def afk_set(_, message: types.Message):
     tokens = message.command[1:]
     duration_seconds = 0
     reason = ""
+    custom = _parse_kv_tokens(tokens)
+
+    # Duration may be first token
     if tokens:
-        # If first token is a duration like '30m' or '2h', parse it
         first = tokens[0]
         dur = _parse_duration_token(first)
         if dur > 0:
             duration_seconds = dur
             tokens = tokens[1:]
 
+    # Remove kv tokens from tokens list for reason assembly
+    tokens = [t for t in tokens if ("=" not in t)]
     if tokens:
         reason = " ".join(tokens).strip()
+
+    # Determine scope: 'chat' or 'global'
+    scope = custom.get("scope") or custom.get("s")
+    if scope and scope.lower() == "chat" and message.chat:
+        scope_val = message.chat.id
+    else:
+        scope_val = "global"
+
+    # custom cooldown
+    cd = DEFAULT_REPLY_COOLDOWN
+    if custom.get("cd"):
+        cd_val = _parse_duration_token(custom.get("cd"))
+        if cd_val > 0:
+            cd = cd_val
 
     AFK_USERS[user_id] = {
         "reason": reason,
@@ -115,12 +234,17 @@ async def afk_set(_, message: types.Message):
         "until": time.time() + duration_seconds if duration_seconds > 0 else None,
         "username": message.from_user.username,
         "name": message.from_user.first_name or "User",
-        "dnd": False,  # DND mode off by default
+        "dnd": False,
+        "scope": scope_val,
         "last_activity": time.time(),
         "mention_count": 0,
-        "last_notified": {},  # per-sender cooldown tracking
-        "reply_cooldown": DEFAULT_REPLY_COOLDOWN,
+        "last_notified": {},
+        "reply_cooldown": cd,
+        "custom_msg": custom.get("msg") or None,
     }
+
+    # Persist
+    _persist_afk(user_id, {"user_id": user_id, "data": AFK_USERS[user_id]})
 
     extra = f" (for {_format_duration(duration_seconds)})" if duration_seconds > 0 else ""
     await message.reply_text(_build_afk_message(reason=reason + extra if reason else reason, seconds=0, dnd=False))
@@ -136,6 +260,8 @@ async def dnd_set(_, message: types.Message):
     tokens = message.command[1:]
     duration_seconds = 0
     reason = ""
+    custom = _parse_kv_tokens(tokens)
+
     if tokens:
         first = tokens[0]
         dur = _parse_duration_token(first)
@@ -143,8 +269,21 @@ async def dnd_set(_, message: types.Message):
             duration_seconds = dur
             tokens = tokens[1:]
 
+    tokens = [t for t in tokens if ("=" not in t)]
     if tokens:
         reason = " ".join(tokens).strip()
+
+    scope = custom.get("scope") or custom.get("s")
+    if scope and scope.lower() == "chat" and message.chat:
+        scope_val = message.chat.id
+    else:
+        scope_val = "global"
+
+    cd = DEFAULT_REPLY_COOLDOWN
+    if custom.get("cd"):
+        cd_val = _parse_duration_token(custom.get("cd"))
+        if cd_val > 0:
+            cd = cd_val
 
     AFK_USERS[user_id] = {
         "reason": reason,
@@ -152,12 +291,16 @@ async def dnd_set(_, message: types.Message):
         "until": time.time() + duration_seconds if duration_seconds > 0 else None,
         "username": message.from_user.username,
         "name": message.from_user.first_name or "User",
-        "dnd": True,  # DND mode enabled
+        "dnd": True,
+        "scope": scope_val,
         "last_activity": time.time(),
         "mention_count": 0,
         "last_notified": {},
-        "reply_cooldown": DEFAULT_REPLY_COOLDOWN,
+        "reply_cooldown": cd,
+        "custom_msg": custom.get("msg") or None,
     }
+
+    _persist_afk(user_id, {"user_id": user_id, "data": AFK_USERS[user_id]})
 
     extra = f" (for {_format_duration(duration_seconds)})" if duration_seconds > 0 else ""
     await message.reply_text(_build_afk_message(reason=reason + extra if reason else reason, seconds=0, dnd=True))
@@ -191,6 +334,7 @@ async def afk_clear(_, message: types.Message):
     # Clean up
     AFK_USERS.pop(user_id, None)
     AFK_MENTIONS.pop(user_id, None)
+    _remove_afk_persist(user_id)
     
     await message.reply_text(text)
 
@@ -290,6 +434,16 @@ async def afk_reply(_, message: types.Message):
                 AFK_MENTIONS.pop(target_id, None)
                 return
 
+            # Respect per-chat opt-out
+            if message.chat and _chat_opted_out(message.chat.id):
+                return
+
+            # Respect scope: if scoped to a chat, only reply inside that chat
+            scope = state.get("scope")
+            if scope != "global" and scope is not None:
+                if not message.chat or message.chat.id != scope:
+                    return
+
             reason = state.get("reason") or ""
             name = state.get("name") or message.reply_to_message.from_user.first_name or "User"
             elapsed = int(now - state.get("time", now))
@@ -316,7 +470,11 @@ async def afk_reply(_, message: types.Message):
             # Send reply and update tracking
             state.setdefault("last_notified", {})[sender_id] = now
             state["mention_count"] = state.get("mention_count", 0) + 1
-            await message.reply_text(_build_afk_message(name=name, reason=reason, seconds=elapsed, dnd=dnd))
+            # Use custom message if provided
+            if state.get("custom_msg"):
+                await message.reply_text(state.get("custom_msg"))
+            else:
+                await message.reply_text(_build_afk_message(name=name, reason=reason, seconds=elapsed, dnd=dnd))
             return
 
     # Check for mentions
@@ -334,6 +492,16 @@ async def afk_reply(_, message: types.Message):
                             AFK_USERS.pop(target_id, None)
                             AFK_MENTIONS.pop(target_id, None)
                             continue
+
+                        # Respect per-chat opt-out
+                        if message.chat and _chat_opted_out(message.chat.id):
+                            continue
+
+                        # Respect scope
+                        scope = state.get("scope")
+                        if scope != "global" and scope is not None:
+                            if not message.chat or message.chat.id != scope:
+                                continue
 
                         reason = state.get("reason") or ""
                         name = state.get("name") or username
