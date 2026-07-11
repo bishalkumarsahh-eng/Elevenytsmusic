@@ -11,7 +11,7 @@
 <br>
 
 [![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=for-the-badge&logo=telegram)](https://t.me/Artistbots)
-[![Support Group](https://img.shields.io/badge/Telegram-Support-blue?style=for-the-badge&logo=telegram)](https://t.me/elevenytsmusic)
+[![Support Group](https://img.shields.io/badge/Telegram-Support-blue?style=for-the-badge&logo=telegram)](https://t.me/junoxmusic)
 
 <br>
 
@@ -339,7 +339,7 @@ python -m Elevenyts
 ### 📢 Telegram Channel 💬 Support Group
 
 - **Telegram Channel**: [Artist bots](https://t.me/Artistbots)
-- **Support Group**: [Elevenyts Music](https://t.me/elevenytsmusic)
+- **Support Group**: [Junox Music](https://t.me/junoxmusic)
 ---
 
 # 🔒 Security Notes
