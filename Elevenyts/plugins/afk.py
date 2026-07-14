@@ -19,6 +19,16 @@ import logging
 import tempfile
 import subprocess
 
+try:
+    result = subprocess.run(
+        ["lottie_convert.py", "--help"],
+        capture_output=True,
+        text=True,
+    )
+    print(result.stdout)
+except Exception as e:
+    print("Lottie Error:", e)
+
 import pyrogram
 from pyrogram import filters
 from pyrogram.enums import MessageEntityType
