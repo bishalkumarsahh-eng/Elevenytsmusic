@@ -265,7 +265,7 @@ async def _sticker_to_jpeg(msg: Message) -> str | None:
             result = subprocess.run(
                 ["ffmpeg", "-y", "-i", raw_path,
                  "-vframes", "1", "-q:v", "2", jpg_path],
-                capture_output=True, text=True timeout=15,
+                capture_output=True, text=True, timeout=15,
             )
             logger.error(f"FFmpeg return code: {result.returncode}")
             logger.error(f"FFmpeg stdout: {result.stdout}")
