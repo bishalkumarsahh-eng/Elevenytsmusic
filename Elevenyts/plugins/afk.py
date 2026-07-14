@@ -388,24 +388,24 @@ async def _send_afk_notification(
                             gif_path,
                         ],
                         check=True,
-                     )
+                    )
 
-                     sent = await app.send_animation(
-                         chat_id,
-                         animation=gif_path,
-                         caption=text,
-                     )
+                    sent = await app.send_animation(
+                        chat_id,
+                        animation=gif_path,
+                        caption=text,
+                    )
 
-                     if os.path.exists(tgs_path):
-                     os.remove(tgs_path)
+                    if os.path.exists(tgs_path):
+                    os.remove(tgs_path)
 
-                     if os.path.exists(gif_path):
-                     os.remove(gif_path)
+                    if os.path.exists(gif_path):
+                    os.remove(gif_path)
 
-                     return "animation", sent.animation.file_id
+                    return "animation", sent.animation.file_id
 
-                 except Exception as e:
-                     logger.debug(f"Animated sticker conversion failed: {e}")
+                except Exception as e:
+                    logger.debug(f"Animated sticker conversion failed: {e}")
 
         elif source_msg and source_msg.animation:
 
