@@ -81,7 +81,6 @@ async def _set_gafk(user_id: int, reason: str = "",
     if not hasattr(db, "cache"):
         return None
     payload = {
-        "chat_id": chat_id,
         "user_id": user_id,
         "reason": reason or "No reason given",
         "since": since or time.time(),
@@ -623,15 +622,12 @@ async def _process_afk_set(m: Message, source_msg: Message | None,
             media_type = "photo"
 
         elif source_msg.sticker:
-
             if source_msg.sticker.is_video:
                 media_type = "video_sticker"
-
-        elif source_msg.sticker.is_animated:
-            media_type = "animated_sticker"
-
-        else:
-            media_type = "photo"
+            elif source_msg.sticker.is_animated:
+                media_type = "animated_sticker"
+            else:
+                media_type = "photo"
 
         elif source_msg.animation:
             media_type = "animation"
@@ -754,6 +750,7 @@ async def afk_unset(_, m: Message):
         return
 
     user_id = m.from_user.id
+    name=m.from_user.first_name or "User"
     chat_id = m.chat.id
     afk_data = await db.get_afk(chat_id, user_id)
 
@@ -776,12 +773,12 @@ async def afk_unset(_, m: Message):
 
     await _send_afk_back(
         chat_id,
-        name,
+        name=m.from_user.first_name or "User",
         reason,
         gone_for,
         {
-            "media_type": local_afk.get("media_type"),
-            "media_file_id": local_afk.get("media_file_id"),
+            "media_type": afk_data.get("media_type"),
+            "media_file_id": afk_data.get("media_file_id"),
         },
     )
     raise pyrogram.StopPropagation
@@ -797,6 +794,7 @@ async def gafk_unset(_, m: Message):
         return
 
     user_id = m.from_user.id
+    name=m.from_user.first_name or "User",
     chat_id = m.chat.id
     gafk_data = await db.get_gafk(user_id)
 
@@ -823,8 +821,8 @@ async def gafk_unset(_, m: Message):
         reason,
         gone_for,
         {
-            "media_type": local_afk.get("media_type"),
-            "media_file_id": local_afk.get("media_file_id"),
+            "media_type": gafk_data.get("media_type"),
+            "media_file_id": gafk_data.get("media_file_id"),
         },
     )
     raise pyrogram.StopPropagation
