@@ -323,15 +323,62 @@ async def _send_afk_notification(
                 logger.debug(f"send_photo (photo fid) failed: {e}")
 
         elif source_msg and source_msg.sticker:
-            jpg_path = await _sticker_to_jpeg(source_msg)
-            if jpg_path:
+
+            sticker = source_msg.sticker
+
+            # Static Sticker
+            if not sticker.is_video and not sticker.is_animated:
+
+                jpg_path = await _sticker_to_jpeg(source_msg)
+
+                if jpg_path:
+                    try:
+                        sent = await app.send_photo(
+                            chat_id,
+                            photo=jpg_path,
+                            caption=text,
+                        )
+
+                        sent_as_photo = True
+
+                        if sent.photo:
+                            return "photo", sent.photo[-1].file_id
+
+                    except Exception as e:
+                        logger.debug(e)
+
+            # Video Sticker (.webm)
+            elif sticker.is_video:
+
                 try:
-                    sent = await app.send_photo(chat_id, photo=jpg_path, caption=text)
-                    sent_as_photo = True
-                    if sent and sent.photo:
-                        photo_file_id = sent.photo[-1].file_id
+                    sent = await app.send_sticker(
+                        chat_id,
+                        sticker=sticker.file_id,
+                    )
+
+                    await app.send_message(chat_id, text)
+
+                    return "video_sticker", sticker.file_id
+
                 except Exception as e:
-                    logger.debug(f"send_photo (sticker jpeg) failed: {e}")
+                    logger.debug(e)
+
+            # Animated Sticker (.tgs)
+
+            elif sticker.is_animated:
+
+                try:
+                    sent = await app.send_sticker(
+                        chat_id,
+                        sticker=sticker.file_id,
+                    )
+
+                    await app.send_message(chat_id, text)
+
+                    return "animated_sticker", sticker.file_id
+
+                except Exception as e:
+                    logger.debug(e)
 
         elif source_msg and source_msg.animation:
 
@@ -424,6 +471,21 @@ async def _send_afk_back(
                     caption=text,
                 )
                 return
+            elif media_type == "video_sticker":
+                await app.send_sticker(
+                    chat_id,
+                    sticker=media_id,
+                )
+                await app.send_message(chat_id, text)
+                return
+
+            elif media_type == "animated_sticker":
+                await app.send_sticker(
+                    chat_id,
+                    sticker=media_id,
+                )
+                await app.send_message(chat_id, text)
+                return
 
             else:
                 await app.send_photo(
@@ -464,10 +526,11 @@ async def _send_afk_mention(m: Message, mid: int, afk_data: dict,
 
         try:
             if media_type == "photo":
-                await m.reply_photo(
-                    photo=media_id,
-                    caption=text
+            elif media_type == "video_sticker":
+                await m.reply_sticker(
+                    sticker=media_id,
                 )
+                await m.reply_text(text)
                 return
 
             elif media_type == "animation":
@@ -548,7 +611,15 @@ async def _process_afk_set(m: Message, source_msg: Message | None,
             media_type = "photo"
 
         elif source_msg.sticker:
-            media_type = "photo"   # sticker converted to image
+
+            if source_msg.sticker.is_video:
+                media_type = "video_sticker"
+
+        elif source_msg.sticker.is_animated:
+            media_type = "animated_sticker"
+
+        else:
+            media_type = "photo"
 
         elif source_msg.animation:
             media_type = "animation"
