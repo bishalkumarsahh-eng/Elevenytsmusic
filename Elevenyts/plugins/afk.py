@@ -28,6 +28,9 @@ from Elevenyts import app, db
 
 logger = logging.getLogger(__name__)
 
+# Prevent duplicate AFK notifications
+_afk_notify_cache = {}
+
 
 async def _set_afk(chat_id: int, user_id: int, reason: str = "",
                    media_type:str | None = None, media_file_id: str | None = None, since: float | None = None,):
@@ -203,7 +206,7 @@ def _get_trigger(m: Message):
 
 
 # ──────────────────────────────────────────────
-#  duplicate protection
+# Prevent duplicate AFK notification
 # ──────────────────────────────────────────────
 
 
