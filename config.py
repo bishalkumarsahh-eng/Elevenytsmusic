@@ -57,8 +57,8 @@ class Config:
         self.VIDEO_MAX_HEIGHT: int = self._parse_video_height()
 
         # ArtistBots API @ArtistApibot
-        self.ARTISTBOTS_API_URL: str = getenv("ARTISTBOTS_API_URL", "https://artistbotsapi.onrender.com")
-        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "ArtistbotsM2296syQMw1kN3ctP4dahU")
+        self.ARTISTBOTS_API_URL: str = getenv("ARTISTBOTS_API_URL", "https://api01.shrutibots.site")
+        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "ShrutiBotsamU6Bvdvv1hiw10VsItP")
         self.ENABLE_API: bool = self._str_to_bool(getenv("ENABLE_API", "True"))
         self.ENABLE_COOKIES_FALLBACK: bool = self._str_to_bool(getenv("ENABLE_COOKIES_FALLBACK", "True"))
         self.API_TIMEOUT: int = int(getenv("API_TIMEOUT", "60"))
