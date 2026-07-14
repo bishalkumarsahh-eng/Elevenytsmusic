@@ -374,38 +374,38 @@ async def _send_afk_notification(
 
             # Animated Sticker (.tgs)
 
-           elif sticker.is_animated:
+            elif sticker.is_animated:
 
-               try:
-                   tgs_path = await app.download_media(sticker.file_id)
+                try:
+                    tgs_path = await app.download_media(sticker.file_id)
 
-                   gif_path = tgs_path.replace(".tgs", ".gif")
+                    gif_path = tgs_path.replace(".tgs", ".gif")
 
-                   subprocess.run(
-                       [
-                           "lottie_convert.py",
-                           tgs_path,
-                           gif_path,
-                       ],
-                       check=True,
-                    )
+                    subprocess.run(
+                        [
+                            "lottie_convert.py",
+                            tgs_path,
+                            gif_path,
+                        ],
+                        check=True,
+                     )
 
-                    sent = await app.send_animation(
-                        chat_id,
-                        animation=gif_path,
-                        caption=text,
-                    )
+                     sent = await app.send_animation(
+                         chat_id,
+                         animation=gif_path,
+                         caption=text,
+                     )
 
-                    if os.path.exists(tgs_path):
-                    os.remove(tgs_path)
+                     if os.path.exists(tgs_path):
+                     os.remove(tgs_path)
 
-                    if os.path.exists(gif_path):
-                    os.remove(gif_path)
+                     if os.path.exists(gif_path):
+                     os.remove(gif_path)
 
-                    return "animation", sent.animation.file_id
+                     return "animation", sent.animation.file_id
 
-                except Exception as e:
-                    logger.debug(f"Animated sticker conversion failed: {e}")
+                 except Exception as e:
+                     logger.debug(f"Animated sticker conversion failed: {e}")
 
         elif source_msg and source_msg.animation:
 
