@@ -773,7 +773,7 @@ async def afk_unset(_, m: Message):
 
     await _send_afk_back(
         chat_id,
-        name=m.from_user.first_name or "User",
+        name,
         reason,
         gone_for,
         {
