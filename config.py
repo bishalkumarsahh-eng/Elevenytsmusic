@@ -58,7 +58,7 @@ class Config:
 
         # ArtistBots API @ArtistApibot
         self.ARTISTBOTS_API_URL: str = getenv("ARTISTBOTS_API_URL", "artistbots-api-apikey.up.railway.app")
-        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "JunoXmusic123456asdfghjklzxcvbnm")
+        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "2VxRA97V3XtFy8OdKWsCnaD4983qu6Ds")
         self.ENABLE_API: bool = self._str_to_bool(getenv("ENABLE_API", "True"))
         self.ENABLE_COOKIES_FALLBACK: bool = self._str_to_bool(getenv("ENABLE_COOKIES_FALLBACK", "True"))
         self.API_TIMEOUT: int = int(getenv("API_TIMEOUT", "60"))
