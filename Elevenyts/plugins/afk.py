@@ -1,12 +1,12 @@
 # ==========================================================
-# Copyright (c) 2026 VelocityBots
+# Copyright (c) 2026 VelocityBots 
 # All Rights Reserved.
 #
-# Project      : Elevenyts Music Bot
-# Powered By   : VelocityBots
-# Type         : Premium AFK Module for Pyrogram 2.x
+# Project      : VelocityBots API Telegram Music Bot
+# Powered By   : VelocityBots 
+# Type         : API Based Telegram Music Bot
 #
-# Bot          : @junoxmusic_Robot
+# Bot          : @JunoXmusic_Robot
 # Channel      : https://t.me/junoxmusic_updates
 # GitHub       : https://github.com/bishalkumarsahh-eng
 #
