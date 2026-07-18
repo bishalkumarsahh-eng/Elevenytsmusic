@@ -776,11 +776,11 @@ async def _handle_afk_list(message: Message) -> None:
 
             try:
                 user = await app.get_users(user_id)
-                name = user.first_name or user.username or str(user_id)
+                display_name = user.first_name
             except Exception:
-                name = str(user_id)
+                display_name = str(user_id)
                 
-            lines.append(f"• User #{user_id} | {scope} | {duration} | {reason}")
+            lines.append(f"• {display_name} | {scope} | {duration} | {reason}")
         lines.append(DIVIDER)
         await _send_text_message(message.chat.id, "\n".join(lines), message.id)
     except Exception as exc:
