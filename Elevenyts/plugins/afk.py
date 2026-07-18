@@ -84,7 +84,7 @@ def _format_duration(seconds: float) -> str:
 
 def _format_since_time(ts: float) -> str:
     try:
-        return time.strftime("%d %b %Y, %H:%M", time.localtime(ts))
+        return datetime.fromtimestamp(ts, IST).strftime("%d %b %Y, %H:%M IST")
     except Exception:
         return "unknown"
 
