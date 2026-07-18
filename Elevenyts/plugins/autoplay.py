@@ -1,17 +1,17 @@
 # ==========================================================
-  # Copyright (c) 2026 ArtistBots
-  # All Rights Reserved.
-  # 
-  # Project      : ArtistBots API Telegram Music Bot
-  # Powered By   : Artist
-  # Type         : API Based Telegram Music Bot
-  #
-  # Bot          : @ArtistApibot
-  # Channel      : https://t.me/artistbots
-  # GitHub       : https://github.com/elevenyts
-  #
-  # Unauthorized copying, modification, or redistribution
-  # of this source code without permission is prohibited.
-  # ==========================================================
+# Copyright (c) 2026 VelocityBots 
+# All Rights Reserved.
+#
+# Project      : VelocityBots API Telegram Music Bot
+# Powered By   : VelocityBots 
+# Type         : API Based Telegram Music Bot
+#
+# Bot          : @JunoXmusic_Robot
+# Channel      : https://t.me/junoxmusic_updates
+# GitHub       : https://github.com/bishalkumarsahh-eng
+#
+# Unauthorized copying, modification, or redistribution
+# of this source code without permission is prohibited.
+# ==========================================================
 import base64
 exec(base64.b64decode("IyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgIyBDb3B5cmlnaHQgKGMpIDIwMjYgQXJ0aXN0Qm90cwogICMgQWxsIFJpZ2h0cyBSZXNlcnZlZC4KICAjCiAgIyBQcm9qZWN0ICAgICAgOiBBcnRpc3RCb3RzIEFQSSBUZWxlZ3JhbSBNdXNpYyBCb3QKICAjIFBvd2VyZWQgQnkgICA6IEFydGlzdAogICMgVHlwZSAgICAgICAgIDogQVBJIEJhc2VkIFRlbGVncmFtIE11c2ljIEJvdAogICMKICAjIEJvdCAgICAgICAgICA6IEBBcnRpc3RBcGlib3QKICAjIENoYW5uZWwgICAgICA6IGh0dHBzOi8vdC5tZS9hcnRpc3Rib3RzCiAgIyBHaXRIdWIgICAgICAgOiBodHRwczovL2dpdGh1Yi5jb20vZWxldmVueXRzCiAgIwogICMgVW5hdXRob3JpemVkIGNvcHlpbmcsIG1vZGlmaWNhdGlvbiwgb3IgcmVkaXN0cmlidXRpb24KICAjIG9mIHRoaXMgc291cmNlIGNvZGUgd2l0aG91dCBwZXJtaXNzaW9uIGlzIHByb2hpYml0ZWQuCiAgIyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Cgpmcm9tIHB5cm9ncmFtIGltcG9ydCBmaWx0ZXJzLCB0eXBlcwoKZnJvbSBFbGV2ZW55dHMgaW1wb3J0IGFwcCwgZGIKZnJvbSBFbGV2ZW55dHMuaGVscGVycyBpbXBvcnQgY2FuX21hbmFnZV92YwoKCkBhcHAub25fbWVzc2FnZShmaWx0ZXJzLmNvbW1hbmQoWyJhdXRvcGxheSIsICJjYXV0b3BsYXkiXSkgJiBmaWx0ZXJzLmdyb3VwICYgfmFwcC5ibF91c2VycykKQGNhbl9tYW5hZ2VfdmMKYXN5bmMgZGVmIF9hdXRvcGxheShfLCBtOiB0eXBlcy5NZXNzYWdlKToKICAgIHRyeToKICAgICAgICBhd2FpdCBtLmRlbGV0ZSgpCiAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgIHBhc3MKCiAgICAjIERldGVybWluZSB0YXJnZXQgY2hhdF9pZDoKICAgICMgLSAvY2F1dG9wbGF5IOKGkiBleHBsaWNpdGx5IHVzZSBsaW5rZWQgY2hhbm5lbAogICAgIyAtIC9hdXRvcGxheSAg4oaSIHVzZSBjaGFubmVsIGlmIGNoYW5uZWwtcGxheSBpcyBhY3RpdmUsIGVsc2UgZ3JvdXAKICAgIGlzX2V4cGxpY2l0X2NoYW5uZWwgPSBtLmNvbW1hbmRbMF0ubG93ZXIoKSA9PSAiY2F1dG9wbGF5IgogICAgY2hhdF9pZCA9IG0uY2hhdC5pZAoKICAgIGNoYW5uZWxfaWQgPSBhd2FpdCBkYi5nZXRfY21vZGUobS5jaGF0LmlkKQoKICAgIGlmIGlzX2V4cGxpY2l0X2NoYW5uZWw6CiAgICAgICAgaWYgY2hhbm5lbF9pZCBpcyBOb25lOgogICAgICAgICAgICByZXR1cm4gYXdhaXQgbS5yZXBseV90ZXh0KAogICAgICAgICAgICAgICAgIjxibG9ja3F1b3RlPuKdjCBDaGFubmVsIHBsYXkgaXMgbm90IGVuYWJsZWQuXG5cbiIKICAgICAgICAgICAgICAgICJVc2UgL2NoYW5uZWxwbGF5IHRvIGVuYWJsZSBpdCBmaXJzdC48L2Jsb2NrcXVvdGU+IgogICAgICAgICAgICApCiAgICAgICAgY2hhdF9pZCA9IGNoYW5uZWxfaWQKICAgIGVsaWYgY2hhbm5lbF9pZCBpcyBub3QgTm9uZToKICAgICAgICAjIC9hdXRvcGxheSBpbiBhIGdyb3VwIHRoYXQgaGFzIGNoYW5uZWwtcGxheSBhY3RpdmUg4oaSIHRhcmdldCBjaGFubmVsCiAgICAgICAgY2hhdF9pZCA9IGNoYW5uZWxfaWQKCiAgICBjdXJyZW50ID0gYXdhaXQgZGIuZ2V0X2F1dG9wbGF5KGNoYXRfaWQpCgogICAgIyBUb2dnbGUgYXV0b3BsYXkKICAgIG5ld19zdGF0ZSA9IG5vdCBjdXJyZW50CiAgICBhd2FpdCBkYi5zZXRfYXV0b3BsYXkoY2hhdF9pZCwgbmV3X3N0YXRlKQoKICAgIGlmIG5ld19zdGF0ZToKICAgICAgICB0ZXh0ID0gKAogICAgICAgICAgICAiPGJsb2NrcXVvdGU+8J+OtSA8Yj5BdXRvcGxheTogT048L2I+XG5cbiIKICAgICAgICAgICAgIkVrIGJhYXIgL3BsYXkga2FybyDigJQgYmFha2kgc29uZ3MgYXBuZSBhYXAgYmFqdGUgcmFoZW5nZSFcbiIKICAgICAgICAgICAgIlF1ZXVlIGtoYXRhbSBob25lIHBhciBtYWluIGF1dG9tYXRpY2FsbHkgc2ltaWxhciBzb25nIGRodW5kaCBrYXIgYmFqYXRhIHJhaHVuZ2EuXG5cbiIKICAgICAgICAgICAgIkJhbmQga2FybmUga2UgbGl5ZSBkb2JhcmEgL2F1dG9wbGF5IGthcm8uPC9ibG9ja3F1b3RlPiIKICAgICAgICApCiAgICBlbHNlOgogICAgICAgIHRleHQgPSAoCiAgICAgICAgICAgICI8YmxvY2txdW90ZT7ij7kgPGI+QXV0b3BsYXk6IE9GRjwvYj5cblxuIgogICAgICAgICAgICAiQXV0b3BsYXkgYmFuZCBrYXIgZGl5YS4gUXVldWUga2hhdGFtIGhvbmUgcGFyIHBsYXliYWNrIHJ1ayBqYXllZ2EuXG5cbiIKICAgICAgICAgICAgIkRvYmFyYSBjaGFsdSBrYXJuZSBrZSBsaXllIC9hdXRvcGxheSBrYXJvLjwvYmxvY2txdW90ZT4iCiAgICAgICAgKQoKICAgIGF3YWl0IG0ucmVwbHlfdGV4dCh0ZXh0KQo="))
