@@ -1,14 +1,14 @@
 # ==========================================================
-# Copyright (c) 2026 ArtistBots
+# Copyright (c) 2026 VelocityBots
 # All Rights Reserved.
 #
 # Project      : Elevenyts Music Bot
-# Powered By   : Artist
+# Powered By   : VelocityBots
 # Type         : Premium AFK Module for Pyrogram 2.x
 #
-# Bot          : @ArtistApibot
-# Channel      : https://t.me/artistbots
-# GitHub       : https://github.com/elevenyts
+# Bot          : @junoxmusic_Robot
+# Channel      : https://t.me/junoxmusic_updates
+# GitHub       : https://github.com/bishalkumarsahh-eng
 #
 # Unauthorized copying, modification, or redistribution
 # of this source code without permission is prohibited.
@@ -19,7 +19,8 @@ import re
 import subprocess
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+IST = timezone(timedelta(hours=5, minutes=30))
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
@@ -253,13 +254,11 @@ def _afk_card(name_html: str, duration: str, since: str, reason: str, is_global:
     reason = reason.strip() or "No reason provided"
     media_section = _format_media_caption(media_type or "", media_caption or "")
     return (
-        f"{DIVIDER}\n"
-        f"<b>{name_html}</b>{label} is now AFK\n\n"
-        f"<b>⏱ Away:</b> {duration}\n"
-        f"<b>📅 Since:</b> {since}\n"
-        f"<b>📝 Reason:</b> {reason}\n"
+        f"<blockquote><b>{name_html}</b>{label} is now AFK</blockquote>\n"
+        f"<blockquote><b>⏱ Away:</b> {duration}</blockquote>\n"
+        f"<blockquote><b>📅 Since:</b> {since}</blockquote>\n"
+        f"<blockquote><b>📝 Reason:</b> {reason}</blockquote>\n"
         f"{media_section}"
-        f"{DIVIDER}"
     )
 
 
@@ -267,13 +266,11 @@ def _welcome_back_card(name_html: str, duration: str, reason: str, media_type: O
     reason = reason.strip() or "No reason provided"
     media_section = _format_media_caption(media_type or "", media_caption or "")
     return (
-        f"{DIVIDER}\n"
-        f"<b>✨ Welcome Back</b>\n\n"
-        f"<b>{name_html}</b> is back!\n\n"
-        f"<b>⏱ AFK Time:</b> {duration}\n"
-        f"<b>📝 Reason:</b> {reason}\n"
+        f"<blockquote><b>✨ Welcome Back</b></blockquote>\n"
+        f"<blockquote><b>{name_html}</b> is back!</blockquote>\n"
+        f"<blockquote><b>⏱ AFK Time:</b> {duration}</blockquote>\n"
+        f"<blockquote><b>📝 Reason:</b> {reason}</blockquote>\n"
         f"{media_section}"
-        f"{DIVIDER}"
     )
 
 
