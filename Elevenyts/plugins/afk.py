@@ -769,6 +769,10 @@ async def _handle_afk_list(message: Message) -> None:
             user_id = entry.get("user_id") or entry.get("_id") or 0
             if not user_id:
                 continue
+                
+            scope = "Global" if entry.get("is_global") else "Local"
+            duration = _format_age(int(entry.get("time", int(time.time()))))
+            reason = (entry.get("reason") or "None").strip() or "None"
 
             try:
                 user = await app.get_users(user_id)
@@ -776,9 +780,6 @@ async def _handle_afk_list(message: Message) -> None:
             except Exception:
                 name = str(user_id)
                 
-            scope = "Global" if entry.get("is_global") else "Local"
-            duration = _format_age(int(entry.get("time", int(time.time()))))
-            reason = (entry.get("reason") or "None").strip() or "None"
             lines.append(f"• User #{user_id} | {scope} | {duration} | {reason}")
         lines.append(DIVIDER)
         await _send_text_message(message.chat.id, "\n".join(lines), message.id)
