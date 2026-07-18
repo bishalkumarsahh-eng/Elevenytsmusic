@@ -780,7 +780,12 @@ async def _handle_afk_list(message: Message) -> None:
             except Exception:
                 display_name = str(user_id)
                 
-            lines.append(f"• {display_name} | {scope} | {duration} | {reason}")
+            lines.append(
+                f"<blockquote>"
+                f"👤 <b>{display_name}</b> 💤 [ {scope} AFK ] [ ⏰ {duration} ]\n"
+                f"💬 Reason : {reason}"
+                f"</blockquote>"
+            )
         lines.append(DIVIDER)
         await _send_text_message(message.chat.id, "\n".join(lines), message.id)
     except Exception as exc:
