@@ -1,17 +1,17 @@
 # ==========================================================
-  # Copyright (c) 2026 ArtistBots
-  # All Rights Reserved.
-  #
-  # Project      : ArtistBots API Telegram Music Bot
-  # Powered By   : Artist
-  # Type         : API Based Telegram Music Bot
-  #
-  # Bot          : @ArtistApibot
-  # Channel      : https://t.me/artistbots
-  # GitHub       : https://github.com/elevenyts
-  #
-  # Unauthorized copying, modification, or redistribution
-  # of this source code without permission is prohibited.
-  # ==========================================================
+# Copyright (c) 2026 VelocityBots 
+# All Rights Reserved.
+#
+# Project      : VelocityBots API Telegram Music Bot
+# Powered By   : VelocityBots 
+# Type         : API Based Telegram Music Bot
+#
+# Bot          : @JunoXmusic_Robot
+# Channel      : https://t.me/junoxmusic_updates
+# GitHub       : https://github.com/bishalkumarsahh-eng
+#
+# Unauthorized copying, modification, or redistribution
+# of this source code without permission is prohibited.
+# ==========================================================
 import base64
 exec(base64.b64decode("IyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiMgQ29weXJpZ2h0IChjKSAyMDI2IEFydGlzdEJvdHMKIyBBbGwgUmlnaHRzIFJlc2VydmVkLgojCiMgUHJvamVjdCAgICAgIDogQXJ0aXN0Qm90cyBBUEkgVGVsZWdyYW0gTXVzaWMgQm90CiMgUG93ZXJlZCBCeSAgIDogQXJ0aXN0CiMgVHlwZSAgICAgICAgIDogQVBJIEJhc2VkIFRlbGVncmFtIE11c2ljIEJvdAojCiMgQm90ICAgICAgICAgIDogQEFydGlzdEFwaWJvdAojIENoYW5uZWwgICAgICA6IGh0dHBzOi8vdC5tZS9hcnRpc3Rib3RzCiMgR2l0SHViICAgICAgIDogaHR0cHM6Ly9naXRodWIuY29tL2VsZXZlbnl0cwojCiMgVW5hdXRob3JpemVkIGNvcHlpbmcsIG1vZGlmaWNhdGlvbiwgb3IgcmVkaXN0cmlidXRpb24KIyBvZiB0aGlzIHNvdXJjZSBjb2RlIHdpdGhvdXQgcGVybWlzc2lvbiBpcyBwcm9oaWJpdGVkLgojID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KaW1wb3J0IHRpbWUKaW1wb3J0IHBzdXRpbAoKZnJvbSBweXJvZ3JhbSBpbXBvcnQgZmlsdGVycywgdHlwZXMKZnJvbSBFbGV2ZW55dHMgaW1wb3J0IGFwcCwgdHVuZSwgYm9vdCwgY29uZmlnLCBsYW5nCmZyb20gRWxldmVueXRzLmhlbHBlcnMgaW1wb3J0IGJ1dHRvbnMKCgpAYXBwLm9uX21lc3NhZ2UoZmlsdGVycy5jb21tYW5kKFsiYWxpdmUiLCAicGluZyJdKSAmIH5hcHAuYmxfdXNlcnMpCkBsYW5nLmxhbmd1YWdlKCkKYXN5bmMgZGVmIF9waW5nKF8sIG06IHR5cGVzLk1lc3NhZ2UpOgogICAgIyBBdXRvLWRlbGV0ZSBjb21tYW5kIG1lc3NhZ2UKICAgIHRyeToKICAgICAgICBhd2FpdCBtLmRlbGV0ZSgpCiAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgIHBhc3MKICAgIAogICAgc3RhcnQgPSB0aW1lLnRpbWUoKQogICAgc2VudCA9IGF3YWl0IG0ucmVwbHlfdGV4dChtLmxhbmdbInBpbmdpbmciXSkKCiAgICBkZWYgZ2V0X3RpbWUocyk6IHJldHVybiAobGFtYmRhIHI6IChmIntyWy0xXX0sICIgaWYgclstMV1bOi00XSAhPSAiMCIgZWxzZSAiIikgKyAiOiIuam9pbihyZXZlcnNlZChyWzotMV0pKSkoCiAgICAgICAgW2Yie3Z9e3V9IiBmb3IgdiwgdSBpbiB6aXAoW3MgJSA2MCwgKHMvLzYwKSAlIDYwLCAocy8vMzYwMCkgJSAyNCwgcy8vODY0MDBdLCBbInMiLCAibSIsICJoIiwgImRheXMiXSldKQogICAgdXB0aW1lID0gZ2V0X3RpbWUoaW50KHRpbWUudGltZSgpIC0gYm9vdCkpCiAgICBsYXRlbmN5ID0gcm91bmQoKHRpbWUudGltZSgpIC0gc3RhcnQpICogMTAwMCwgMikKICAgIAogICAgIyBHZXQgc3lzdGVtIHN0YXRzCiAgICBtZW0gPSBwc3V0aWwudmlydHVhbF9tZW1vcnkoKQogICAgcmFtX3VzYWdlID0gZiJ7cm91bmQobWVtLnVzZWQgLyAoMTAyNCAqKiAzKSwgMSl9R0IgLyB7cm91bmQobWVtLnRvdGFsIC8gKDEwMjQgKiogMyksIDEpfUdCIgogICAgY3B1X3BlcmNlbnQgPSBwc3V0aWwuY3B1X3BlcmNlbnQoaW50ZXJ2YWw9MC41KQogICAgCiAgICAjIEdldCBhY3RpdmUgY2hhdHMgY291bnQKICAgIGZyb20gRWxldmVueXRzIGltcG9ydCBkYgogICAgYWN0aXZlX2NoYXRzID0gbGVuKGF3YWl0IGRiLmdldF9jaGF0cygpKQogICAgCiAgICBjYXB0aW9uX3RleHQgPSBtLmxhbmdbInBpbmdfcG9uZyJdLmZvcm1hdCgKICAgICAgICBsYXRlbmN5LAogICAgICAgIHVwdGltZSwKICAgICAgICBhd2FpdCB0dW5lLnBpbmcoKSwKICAgICAgICByYW1fdXNhZ2UsCiAgICAgICAgY3B1X3BlcmNlbnQsCiAgICAgICAgYWN0aXZlX2NoYXRzLAogICAgKQogICAgCiAgICAjIFRyeSB0byBzZW5kIHdpdGggbWVkaWEsIGZhbGxiYWNrIHRvIHRleHQgaWYgaXQgZmFpbHMKICAgIHRyeToKICAgICAgICBhd2FpdCBzZW50LmVkaXRfbWVkaWEoCiAgICAgICAgICAgIG1lZGlhPXR5cGVzLklucHV0TWVkaWFQaG90bygKICAgICAgICAgICAgICAgIG1lZGlhPWNvbmZpZy5QSU5HX0lNRywKICAgICAgICAgICAgICAgIGNhcHRpb249Y2FwdGlvbl90ZXh0CiAgICAgICAgICAgICksCiAgICAgICAgICAgIHJlcGx5X21hcmt1cD1idXR0b25zLnBpbmdfbWFya3VwKG0ubGFuZ1sic3VwcG9ydCJdKSwKICAgICAgICApCiAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICMgRmFsbGJhY2sgdG8gdGV4dCBpZiBtZWRpYSBmYWlscwogICAgICAgIGF3YWl0IHNlbnQuZWRpdF90ZXh0KAogICAgICAgICAgICB0ZXh0PWNhcHRpb25fdGV4dCwKICAgICAgICAgICAgcmVwbHlfbWFya3VwPWJ1dHRvbnMucGluZ19tYXJrdXAobS5sYW5nWyJzdXBwb3J0Il0pLAogICAgICAgICkK").decode("utf-8"))
