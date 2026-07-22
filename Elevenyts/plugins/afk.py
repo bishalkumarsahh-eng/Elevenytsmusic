@@ -612,18 +612,18 @@ async def _handle_afk_notification(message: Message) -> None:
             since_timestamp = int(afk_entry.get("time", int(time.time())))
             since_label = _format_age(since_timestamp)
             user_name = message.reply_to_message.from_user.first_name if message.reply_to_message and message.reply_to_message.from_user else (message.from_user.first_name if message.from_user else "User")
-            card_text = (
-                f"{_afk_card(
-                    user_name,
-                    since_label,
-                    _format_since_time(since_timestamp),
-                    reason,
-                    bool(afk_entry.get('is_global', False)),
-                    media_payload.get('media_type', 'text'),
-                    media_payload.get('caption', ''),
-                )}\n"
-                f"<i>Triggered by:</i> {message.from_user.first_name}"
+            _afk_card = _afk_card(
+                user_name,
+                since_label,
+                _format_since_time(since_timestamp),
+                reason,
+                bool(afk_entry.get('is_global', False)),
+                media_payload.get('media_type', 'text'),
+                media_payload.get('caption', ''),
             )
+            card_text = (
+                f"{afk_card}\n"
+                f"<i>Triggered by:</i> {message.from_user.first_name}"
             if media_payload.get("media_type", "text") == "text":
                 await _send_text_message(message.chat.id, card_text, message.id)
             else:
