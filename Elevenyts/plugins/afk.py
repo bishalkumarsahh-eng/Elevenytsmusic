@@ -624,6 +624,7 @@ async def _handle_afk_notification(message: Message) -> None:
             card_text = (
                 f"{afk_card}\n"
                 f"<i>Triggered by:</i> {message.from_user.first_name}"
+            )
             if media_payload.get("media_type", "text") == "text":
                 await _send_text_message(message.chat.id, card_text, message.id)
             else:
