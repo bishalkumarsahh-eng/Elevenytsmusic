@@ -259,6 +259,28 @@ def _art_text(canvas, title, artist, ax, ay, sz):
 
 
 # ══════════════════════════════════════════════════════════════════════════
+# PLACEHOLDER — used when no album art is provided
+# ══════════════════════════════════════════════════════════════════════════
+
+def _placeholder() -> Image.Image:
+    img = Image.new("RGB", (600, 600))
+    d   = ImageDraw.Draw(img)
+    for i in range(600):
+        t = i / 600
+        d.rectangle([0, i, 599, i+1],
+                    fill=(int(60+100*t), int(5+30*t), int(100+140*t)))
+    glow = Image.new("RGBA", (600, 600), (0, 0, 0, 0))
+    gd   = ImageDraw.Draw(glow, "RGBA")
+    for r in range(200, 0, -8):
+        a = int(55 * (1 - r / 200))
+        gd.ellipse([300-r, 300-r, 300+r, 300+r], fill=(160, 100, 255, a))
+    img = Image.alpha_composite(img.convert("RGBA"), glow).convert("RGB")
+    ImageDraw.Draw(img).text((220, 250), "♫", font=_font(90, bold=True),
+                             fill=(220, 210, 255))
+    return img
+
+
+# ══════════════════════════════════════════════════════════════════════════
 # CORE GENERATOR FUNCTION
 # ══════════════════════════════════════════════════════════════════════════
 
@@ -273,39 +295,34 @@ def generate_thumbnail(
     is_playing: bool  = True,
 ) -> str:
 
-    # ── load art ────────────────────────────────────────────────────────
     if isinstance(album_art, Image.Image):
         art = album_art.convert("RGBA")
-    elif isinstance(album_art, (str, Path)) and str(album_art).startswith(("http://","https://")):
+    elif isinstance(album_art, (str, Path)) and str(album_art).startswith(("http://", "https://")):
         with urllib.request.urlopen(str(album_art)) as r:
             art = Image.open(io.BytesIO(r.read())).convert("RGBA")
     else:
         art = Image.open(album_art).convert("RGBA")
 
     art_sq = art.resize((ART_SIZE, ART_SIZE), Image.LANCZOS)
-
     canvas = _make_bg(art_sq)
 
-    # main glass card
     _glass_rect(canvas,
                 CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
                 r=CARD_R, blur=26,
                 tint_alpha=14, border_alpha=100,
                 shine_alpha=90, inner_alpha=35, border_w=2)
 
-    # album art
     mask_art = _rounded_mask((ART_SIZE, ART_SIZE), ART_R)
     canvas.paste(art_sq.convert("RGBA"), (ART_X, ART_Y), mask_art)
 
     d = ImageDraw.Draw(canvas, "RGBA")
     d.rounded_rectangle([ART_X-2, ART_Y-2, ART_X+ART_SIZE+2, ART_Y+ART_SIZE+2],
-                        radius=ART_R+2, outline=(255,255,255,80), width=2)
+                        radius=ART_R+2, outline=(255, 255, 255, 80), width=2)
     d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
-                        radius=ART_R+1, outline=(255,255,255,30), width=1)
+                        radius=ART_R+1, outline=(255, 255, 255, 30), width=1)
 
     _art_text(canvas, title, artist, ART_X, ART_Y, ART_SIZE)
 
-    # right panel
     d = ImageDraw.Draw(canvas, "RGBA")
     iy = CARD_Y + 48
 
@@ -324,15 +341,15 @@ def generate_thumbnail(
 
     f_art = _font(22)
     d.text((INFO_X, iy), artist, font=f_art, fill=LGRAY)
-    ab = d.textbbox((INFO_X, iy), artist, font=f_art)
+    ab  = d.textbbox((INFO_X, iy), artist, font=f_art)
     bx  = ab[2] + 14
     by  = iy + (ab[3]-ab[1])//2
     d.ellipse([bx-12, by-12, bx+12, by+12], fill=(*GREEN, 40))
     d.ellipse([bx-10, by-10, bx+10, by+10], fill=GREEN)
-    d.text((bx-5, by-8), "✓", font=_font(13, bold=True), fill=(10,10,10))
+    d.text((bx-5, by-8), "✓", font=_font(13, bold=True), fill=(10, 10, 10))
 
-    rx  = CARD_X + CARD_W - 36
-    ry  = CARD_Y + 48
+    rx = CARD_X + CARD_W - 36
+    ry = CARD_Y + 48
     _glass_pill(canvas, rx-64, ry, 52, 38, r=19,
                 tint_alpha=20, border_alpha=85, shine_alpha=60)
     d = ImageDraw.Draw(canvas, "RGBA")
@@ -344,23 +361,21 @@ def generate_thumbnail(
 
     iy += 50
 
-    # progress bar
     pct   = current_sec / max(1, duration_sec)
     bar_y = iy + 18
     d = ImageDraw.Draw(canvas, "RGBA")
     _bar(d, INFO_X, bar_y, INFO_W, 5, pct,
-         track=(255,255,255,40), fill=GREEN, dot=WHITE, dot_r=8)
+         track=(255, 255, 255, 40), fill=GREEN, dot=WHITE, dot_r=8)
 
-    iy = bar_y + 34
+    iy  = bar_y + 34
     f_t = _font(16)
     d.text((INFO_X, iy), _fmt(current_sec), font=f_t, fill=LGRAY)
-    tw  = d.textbbox((0,0), _fmt(duration_sec), font=f_t)
+    tw  = d.textbbox((0, 0), _fmt(duration_sec), font=f_t)
     d.text((INFO_X+INFO_W-(tw[2]-tw[0]), iy), _fmt(duration_sec),
            font=f_t, fill=LGRAY)
 
     iy += 52
 
-    # transport controls
     ctrl_y = iy + 6
     mid    = INFO_X + INFO_W // 2
     sp     = 74
@@ -380,7 +395,6 @@ def generate_thumbnail(
     _repeat(d, mid + sp*2, ctrl_y, LGRAY)
     d.ellipse([mid+sp*2-3, ctrl_y+23, mid+sp*2+3, ctrl_y+29], fill=GREEN)
 
-    # volume strip
     bot_y = CARD_Y + CARD_H - 60
     _glass_rect(canvas,
                 INFO_X - 12, bot_y,
@@ -395,14 +409,13 @@ def generate_thumbnail(
     vol_x = vx + 30
     vol_w = INFO_W - 108
     _bar(d, vol_x, vy-3, vol_w, 4, 0.52,
-         track=(255,255,255,38), fill=TEAL, dot=WHITE, dot_r=7)
+         track=(255, 255, 255, 38), fill=TEAL, dot=WHITE, dot_r=7)
 
     ri = CARD_X + CARD_W - 22
     for sym in ["⊞", "⊡", "⤢"]:
         d.text((ri-24, bot_y+14), sym, font=_font(18), fill=LGRAY)
         ri -= 40
 
-    # header UPGRADE pill
     _glass_pill(canvas, W-126, 30, 90, 30, r=15,
                 tint_alpha=16, border_alpha=80, shine_alpha=55)
     d = ImageDraw.Draw(canvas, "RGBA")
@@ -415,42 +428,26 @@ def generate_thumbnail(
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# THUMBNAIL CLASS — wraps generate_thumbnail() for bot usage
+# THUMBNAIL CLASS — drop-in replacement for bot usage
 # ══════════════════════════════════════════════════════════════════════════
 
 class Thumbnail:
-    """
-    Glassmorphism thumbnail generator.
-
-    Usage in your bot:
-        thumb = Thumbnail()
-        path = await thumb.generate(
-            title="Song Name",
-            artist="Artist",
-            album_art="path/to/cover.jpg",   # file path, URL, or PIL Image
-            current_sec=92,
-            duration_sec=227,
-            output_path="thumb.png",
-            is_playing=True,
-        )
-    """
-
     async def generate(
         self,
-        title: str,
-        artist: str,
-        album_art,
-        current_sec: int = 0,
+        title: str        = "Now Playing",
+        artist: str       = "",
+        album_art         = None,
+        current_sec: int  = 0,
         duration_sec: int = 1,
         output_path: str  = "thumb.png",
         source_label: str = "PLAYING FROM ALBUM",
         is_playing: bool  = True,
     ) -> str:
-        """Generate a Spotify-style glassmorphism thumbnail and return its path."""
+        art = album_art if album_art is not None else _placeholder()
         return generate_thumbnail(
             title        = title,
             artist       = artist,
-            album_art    = album_art,
+            album_art    = art,
             current_sec  = current_sec,
             duration_sec = duration_sec,
             output_path  = output_path,
@@ -458,7 +455,5 @@ class Thumbnail:
             is_playing   = is_playing,
         )
 
-    # Sync alias for callers that don't await
     def generate_sync(self, *args, **kwargs) -> str:
         return generate_thumbnail(*args, **kwargs)
-
