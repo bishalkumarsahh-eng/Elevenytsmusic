@@ -85,7 +85,7 @@ def _make_bg(art: Image.Image) -> Image.Image:
     bg     = bg.crop((ox, oy, ox + W, oy + H))
 
     # Light blur — keeps colour and depth visible
-    bg = bg.filter(ImageFilter.GaussianBlur(radius=4))
+    bg = bg.filter(ImageFilter.GaussianBlur(radius=2))
 
     # Light dark tint — keep colours vibrant (was 0.52, now 0.32)
     dark = Image.new("RGB", (W, H), (4, 4, 18))
@@ -380,12 +380,12 @@ def _render(art: Image.Image, title: str, artist: str,
         ri -= 40
 
     # UPGRADE pill
-    _glass_pill(canvas, W-126, 30, 90, 30, r=15,
+    _glass_pill(canvas, W-140, 30, 130, 32, r=16,
                 tint_alpha=16, border_alpha=80, shine_alpha=55)
     d = ImageDraw.Draw(canvas, "RGBA")
-    d.text((W-164, 19), "UPGRADE", font=_font(13, bold=True), fill=WHITE)
-    d.text((W-60,  18), "🔔",      font=_font(18),             fill=LGRAY)
-    d.text((W-28,  18), "···",     font=_font(18, bold=True),  fill=LGRAY)
+    d.text((W-178, 16), "VelocityBots", font=_font(17, bold=True), fill=WHITE)
+    d.text((W-60,  18), "🔔",           font=_font(18),            fill=LGRAY)
+    d.text((W-28,  18), "···",          font=_font(18, bold=True), fill=LGRAY)
 
     return canvas
 
