@@ -14,106 +14,451 @@
 # of this source code without permission is prohibited.
 # ==========================================================
 
-import base64
-exec(base64.b64decode("IyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09CiMgQ29weXJpZ2h0IChjKSAyMDI2IFZlbG9jaXR5Qm90cwojIEFsbCBSaWdodHMgUmVzZXJ2
-ZWQuCiMKIyBQcm9qZWN0ICAgICAgOiBWZWxvY2l0eUJvdHMgQVBJIFRlbGVncmFtIE11c2ljIEJv
-dAojIFBvd2VyZWQgQnkgICA6IFZlbG9jaXR5Qm90cwojIFR5cGUgICAgICAgICA6IEFQSSBCYXNl
-ZCBUZWxlZ3JhbSBNdXNpYyBCb3QKIwojIEJvdCAgICAgICAgICA6IEBKdW5vWG11c2ljX1JvYm90
-CiMgQ2hhbm5lbCAgICAgIDogaHR0cHM6Ly90Lm1lL2p1bm94bXVzaWNfdXBkYXRlcwojIEdpdEh1
-YiAgICAgICA6IGh0dHBzOi8vZ2l0aHViLmNvbS9iaXNoYWxrdW1hcnNhaGgtZW5nCiMKIyBVbmF1
-dGhvcml6ZWQgY29weWluZywgbW9kaWZpY2F0aW9uLCBvciByZWRpc3RyaWJ1dGlvbgojIG9mIHRo
-aXMgc291cmNlIGNvZGUgd2l0aG91dCBwZXJtaXNzaW9uIGlzIHByb2hpYml0ZWQuCiMgPT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKIiIi
-ClVsdHJhLWdsYXNzbW9ycGhpc20gbXVzaWMgdGh1bWJuYWlsIGdlbmVyYXRvciBmb3IgVGVsZWdy
-YW0gYm90cy4KClVzYWdlOgogICAgcHl0aG9uIHRodW1iLnB5CiAgICAgICAgLS10aXRsZSAgICJT
-b25nIFRpdGxlIgogICAgICAgIC0tYXJ0aXN0ICAiQXJ0aXN0IE5hbWUiCiAgICAgICAgLS1hbGJ1
-bV9hcnQgcGF0aC90by9jb3Zlci5qcGcgICAob3IgVVJMKQogICAgICAgIC0tY3VycmVudCAgOTIK
-ICAgICAgICAtLWR1cmF0aW9uIDIyNwogICAgICAgIC0tb3V0cHV0ICAgdGh1bWIucG5nCgpPciBp
-bXBvcnQgZ2VuZXJhdGVfdGh1bWJuYWlsKCkgZGlyZWN0bHkgZnJvbSB5b3VyIGJvdC4KIiIiCgpp
-bXBvcnQgYXJncGFyc2UKaW1wb3J0IGlvCmltcG9ydCB1cmxsaWIucmVxdWVzdAppbXBvcnQgdGV4
-dHdyYXAKZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgpmcm9tIFBJTCBpbXBvcnQgSW1hZ2UsIElt
-YWdlRHJhdywgSW1hZ2VGaWx0ZXIsIEltYWdlRm9udAoKIyDilIDilIAgY2FudmFzIOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgApXLCBIID0gMTI4MCwgNzIwCgojIOKUgOKUgCBjYXJkIGdlb21ldHJ5
-IOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgApDQVJEX1gsIENBUkRfWSA9IDUyLCA2OApDQVJEX1csIENBUkRfSCA9IFcgLSAxMDQsIEgg
-LSAxMzYKQ0FSRF9SICAgICAgICAgPSAzOAoKQVJUX1NJWkUgPSBDQVJEX0ggLSA0OApBUlRfWCAg
-ICA9IENBUkRfWCArIDI0CkFSVF9ZICAgID0gQ0FSRF9ZICsgMjQKQVJUX1IgICAgPSAyNgoKSU5G
-T19YICA9IEFSVF9YICsgQVJUX1NJWkUgKyA1NgpJTkZPX1cgID0gQ0FSRF9YICsgQ0FSRF9XIC0g
-SU5GT19YIC0gMzYKCiMg4pSA4pSAIGNvbG91ciBwYWxldHRlIOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgApHUkVFTiAgPSAoMjksICAyMTUs
-ICA4NCkKVEVBTCAgID0gKDIwLCAgMjIwLCAxNjApCldISVRFICA9ICgyNTUsIDI1NSwgMjU1KQpM
-R1JBWSAgPSAoMjAwLCAyMDAsIDIxNSkKCkZPTlRfRElSID0gUGF0aChfX2ZpbGVfXykucGFyZW50
-IC8gImZvbnRzIgoKCiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQCiMgRk9OVFMKIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDi
-lZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDi
-lZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDi
-lZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDi
-lZDilZDilZDilZDilZAKCmRlZiBfZm9udChzaXplOiBpbnQsIGJvbGQ6IGJvb2wgPSBGYWxzZSkg
-LT4gSW1hZ2VGb250LkZyZWVUeXBlRm9udDoKICAgIGNhbmRpZGF0ZXMgPSBbCiAgICAgICAgRk9O
-VF9ESVIgLyAoIkJvbGQudHRmIiAgICBpZiBib2xkIGVsc2UgIlJlZ3VsYXIudHRmIiksCiAgICAg
-ICAgRk9OVF9ESVIgLyAoImJvbGQudHRmIiAgICBpZiBib2xkIGVsc2UgInJlZ3VsYXIudHRmIiks
-CiAgICAgICAgIi91c3Ivc2hhcmUvZm9udHMvdHJ1ZXR5cGUvZGVqYXZ1L0RlamFWdVNhbnMtQm9s
-ZC50dGYiICAgICAgICAgaWYgYm9sZCBlbHNlCiAgICAgICAgIi91c3Ivc2hhcmUvZm9udHMvdHJ1
-ZXR5cGUvZGVqYXZ1L0RlamFWdVNhbnMudHRmIiwKICAgICAgICAiL3Vzci9zaGFyZS9mb250cy90
-...
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiAgICBfZ2xhc3NfcGls
-bChjYW52YXMsIFctMTI2LCAzMCwgOTAsIDMwLCByPTE1LAogICAgICAgICAgICAgICAgdGludF9h
-bHBoYT0xNiwgYm9yZGVyX2FscGhhPTgwLCBzaGluZV9hbHBoYT01NSkKICAgIGQgPSBJbWFnZURy
-YXcuRHJhdyhjYW52YXMsICJSR0JBIikKICAgIGQudGV4dCgoVy0xNjQsIDE5KSwgIlVQR1JBREUi
-LCBmb250PV9mb250KDEzLCBib2xkPVRydWUpLCBmaWxsPVdISVRFKQogICAgZC50ZXh0KChXLTYw
-LCAgMTgpLCAi8J+UlCIsICAgICAgZm9udD1fZm9udCgxOCksICAgICAgICAgICAgIGZpbGw9TEdS
-QVkpCiAgICBkLnRleHQoKFctMjgsICAxOCksICLCt8K3wrciLCAgICAgZm9udD1fZm9udCgxOCwg
-Ym9sZD1UcnVlKSwgIGZpbGw9TEdSQVkpCgogICAgIyDilIDilIAgc2F2ZSDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAK
-ICAgIGNhbnZhcy5jb252ZXJ0KCJSR0IiKS5zYXZlKG91dHB1dF9wYXRoLCAiUE5HIiwgb3B0aW1p
-emU9VHJ1ZSkKICAgIHByaW50KGYi4pyTIFNhdmVkIOKGkiB7b3V0cHV0X3BhdGh9ICAoe1d9w5d7
-SH0pIikKICAgIHJldHVybiBvdXRwdXRfcGF0aAoKCiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCiMgQ0xJCiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ
-4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQCgpkZWYgX3BsYWNlaG9sZGVyKCkgLT4gSW1h
-Z2UuSW1hZ2U6CiAgICBpbWcgPSBJbWFnZS5uZXcoIlJHQiIsICg2MDAsIDYwMCkpCiAgICBkICAg
-PSBJbWFnZURyYXcuRHJhdyhpbWcpCiAgICBmb3IgaSBpbiByYW5nZSg2MDApOgogICAgICAgIHQg
-PSBpLzYwMAogICAgICAgIGQucmVjdGFuZ2xlKFswLGksNTk5LGkrMV0sCiAgICAgICAgICAgICAg
-ICAgICAgZmlsbD0oaW50KDYwKzEwMCp0KSwgaW50KDUrMzAqdCksIGludCgxMDArMTQwKnQpKSkK
-ICAgIGdsb3cgPSBJbWFnZS5uZXcoIlJHQkEiLCAoNjAwLDYwMCksICgwLDAsMCwwKSkKICAgIGdk
-ICAgPSBJbWFnZURyYXcuRHJhdyhnbG93LCJSR0JBIikKICAgIGZvciByIGluIHJhbmdlKDIwMCww
-LC04KToKICAgICAgICBhID0gaW50KDU1KigxLXIvMjAwKSkKICAgICAgICBnZC5lbGxpcHNlKFsz
-MDAtciwzMDAtciwzMDArciwzMDArcl0sIGZpbGw9KDE2MCwxMDAsMjU1LGEpKQogICAgaW1nID0g
-SW1hZ2UuYWxwaGFfY29tcG9zaXRlKGltZy5jb252ZXJ0KCJSR0JBIiksZ2xvdykuY29udmVydCgi
-UkdCIikKICAgIEltYWdlRHJhdy5EcmF3KGltZykudGV4dCgoMjIwLDI1MCksIuKZqyIsIGZvbnQ9
-X2ZvbnQoOTAsYm9sZD1UcnVlKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBmaWxsPSgy
-MjAsMjEwLDI1NSkpCiAgICByZXR1cm4gaW1nCgoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoK
-ICAgIHAgPSBhcmdwYXJzZS5Bcmd1bWVudFBhcnNlcigpCiAgICBwLmFkZF9hcmd1bWVudCgiLS10
-aXRsZSIsICAgICBkZWZhdWx0PSJNaWRuaWdodCBFY2hvZXMiKQogICAgcC5hZGRfYXJndW1lbnQo
-Ii0tYXJ0aXN0IiwgICAgZGVmYXVsdD0iTHVuYSBSYXkiKQogICAgcC5hZGRfYXJndW1lbnQoIi0t
-YWxidW1fYXJ0IiwgZGVmYXVsdD1Ob25lKQogICAgcC5hZGRfYXJndW1lbnQoIi0tY3VycmVudCIs
-ICAgdHlwZT1pbnQsIGRlZmF1bHQ9OTIpCiAgICBwLmFkZF9hcmd1bWVudCgiLS1kdXJhdGlvbiIs
-ICB0eXBlPWludCwgZGVmYXVsdD0yMjcpCiAgICBwLmFkZF9hcmd1bWVudCgiLS1vdXRwdXQiLCAg
-ICBkZWZhdWx0PSJ0aHVtYm5haWwucG5nIikKICAgIHAuYWRkX2FyZ3VtZW50KCItLXBhdXNlZCIs
-ICAgIGFjdGlvbj0ic3RvcmVfdHJ1ZSIpCiAgICBhcmdzID0gcC5wYXJzZV9hcmdzKCkKICAgIGFy
-dCAgPSBhcmdzLmFsYnVtX2FydCBpZiBhcmdzLmFsYnVtX2FydCBlbHNlIF9wbGFjZWhvbGRlcigp
-CiAgICBnZW5lcmF0ZV90aHVtYm5haWwoCiAgICAgICAgdGl0bGUgICAgICAgID0gYXJncy50aXRs
-ZSwKICAgICAgICBhcnRpc3QgICAgICAgPSBhcmdzLmFydGlzdCwKICAgICAgICBhbGJ1bV9hcnQg
-ICAgPSBhcnQsCiAgICAgICAgY3VycmVudF9zZWMgID0gYXJncy5jdXJyZW50LAogICAgICAgIGR1
-cmF0aW9uX3NlYyA9IGFyZ3MuZHVyYXRpb24sCiAgICAgICAgb3V0cHV0X3BhdGggID0gYXJncy5v
-dXRwdXQsCiAgICAgICAgaXNfcGxheWluZyAgID0gbm90IGFyZ3MucGF1c2VkLAogICAgKQo=").decode("utf-8"))
+"""
+Ultra-glassmorphism music thumbnail generator for Telegram bots.
+Drop this file into Elevenyts/helpers/_thumbnails.py
+"""
+
+import io
+import textwrap
+import urllib.request
+from pathlib import Path
+
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+# ── canvas ─────────────────────────────────────────────────────────────────
+W, H = 1280, 720
+
+# ── card geometry ──────────────────────────────────────────────────────────
+CARD_X, CARD_Y = 52, 68
+CARD_W, CARD_H = W - 104, H - 136
+CARD_R         = 38
+
+ART_SIZE = CARD_H - 48
+ART_X    = CARD_X + 24
+ART_Y    = CARD_Y + 24
+ART_R    = 26
+
+INFO_X  = ART_X + ART_SIZE + 56
+INFO_W  = CARD_X + CARD_W - INFO_X - 36
+
+# ── colour palette ─────────────────────────────────────────────────────────
+GREEN  = (29,  215,  84)
+TEAL   = (20,  220, 160)
+WHITE  = (255, 255, 255)
+LGRAY  = (200, 200, 215)
+
+FONT_DIR = Path(__file__).parent / "fonts"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# FONTS
+# ══════════════════════════════════════════════════════════════════════════
+
+def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
+    candidates = [
+        FONT_DIR / ("Bold.ttf"    if bold else "Regular.ttf"),
+        FONT_DIR / ("bold.ttf"    if bold else "regular.ttf"),
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"         if bold else
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold else
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    ]
+    for p in candidates:
+        try:
+            return ImageFont.truetype(str(p), size)
+        except Exception:
+            pass
+    return ImageFont.load_default(size=size)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# BACKGROUND — rich bokeh
+# ══════════════════════════════════════════════════════════════════════════
+
+def _make_bg(art: Image.Image) -> Image.Image:
+    bg = art.convert("RGB").resize((W, H), Image.LANCZOS)
+    for r in (22, 22, 14):
+        bg = bg.filter(ImageFilter.GaussianBlur(radius=r))
+    dark = Image.new("RGB", (W, H), (4, 4, 14))
+    bg   = Image.blend(bg, dark, alpha=0.52)
+    return bg.convert("RGBA")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# CORE GLASS PRIMITIVE
+# ══════════════════════════════════════════════════════════════════════════
+
+def _rounded_mask(size, r: int) -> Image.Image:
+    m = Image.new("L", size, 0)
+    ImageDraw.Draw(m).rounded_rectangle(
+        [0, 0, size[0]-1, size[1]-1], radius=r, fill=255)
+    return m
+
+
+def _glass_rect(canvas: Image.Image,
+                x0, y0, x1, y1, r: int,
+                blur: int        = 22,
+                tint_alpha: int  = 18,
+                border_alpha: int= 90,
+                shine_alpha: int = 80,
+                inner_alpha: int = 30,
+                border_w: int   = 2):
+    w, h   = x1 - x0, y1 - y0
+    mask   = _rounded_mask((w, h), r)
+
+    region  = canvas.crop((x0, y0, x1, y1)).convert("RGBA")
+    blurred = region.filter(ImageFilter.GaussianBlur(radius=blur))
+
+    tint = Image.new("RGBA", (w, h), (255, 255, 255, tint_alpha))
+    blurred = Image.alpha_composite(blurred, tint)
+
+    shine_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shine_layer)
+    shine_h = min(h // 3, 90)
+    for i in range(shine_h):
+        t  = 1 - (i / shine_h) ** 1.6
+        a  = int(shine_alpha * t)
+        sd.line([(0, i), (w, i)], fill=(255, 255, 255, a))
+    for i in range(min(8, h)):
+        a = int(120 * (1 - i / 8))
+        sd.line([(int(w*.10), i), (int(w*.70), i)], fill=(255, 255, 255, a))
+    blurred = Image.alpha_composite(blurred, shine_layer)
+
+    frame = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    frame.paste(blurred, mask=mask)
+    canvas.alpha_composite(frame, (x0, y0))
+
+    d = ImageDraw.Draw(canvas, "RGBA")
+    for bw in range(border_w):
+        a = max(0, border_alpha - bw * 30)
+        d.rounded_rectangle(
+            [x0+bw, y0+bw, x1-bw, y1-bw],
+            radius=max(2, r-bw),
+            outline=(255, 255, 255, a),
+            width=1)
+
+    d.rounded_rectangle(
+        [x0+border_w+1, y0+border_w+1,
+         x1-border_w-1, y1-border_w-1],
+        radius=max(2, r-border_w-1),
+        outline=(255, 255, 255, inner_alpha),
+        width=1)
+
+    return canvas
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# GLASS PILL HELPER
+# ══════════════════════════════════════════════════════════════════════════
+
+def _glass_pill(canvas, cx, cy, pw, ph, r=None,
+                tint_alpha=16, border_alpha=75, shine_alpha=55):
+    r  = r if r is not None else ph // 2
+    x0 = cx - pw // 2
+    y0 = cy - ph // 2
+    _glass_rect(canvas, x0, y0, x0+pw, y0+ph, r,
+                blur=14,
+                tint_alpha=tint_alpha,
+                border_alpha=border_alpha,
+                shine_alpha=shine_alpha,
+                inner_alpha=20,
+                border_w=1)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# PROGRESS / VOLUME BAR
+# ══════════════════════════════════════════════════════════════════════════
+
+def _bar(draw, x, y, w, h, pct,
+         track=(255,255,255,38), fill=GREEN, dot=WHITE, dot_r=8):
+    draw.rounded_rectangle([x, y, x+w, y+h], radius=h//2, fill=track)
+    fw = max(0, int(w * min(1.0, max(0.0, pct))))
+    if fw > h:
+        draw.rounded_rectangle([x, y, x+fw, y+h], radius=h//2, fill=fill)
+    cx2, cy2 = x+fw, y+h//2
+    draw.ellipse([cx2-dot_r-4, cy2-dot_r-4, cx2+dot_r+4, cy2+dot_r+4],
+                 fill=(*dot[:3], 50))
+    draw.ellipse([cx2-dot_r-1, cy2-dot_r-1, cx2+dot_r+1, cy2+dot_r+1],
+                 fill=(*dot[:3], 90))
+    draw.ellipse([cx2-dot_r,   cy2-dot_r,   cx2+dot_r,   cy2+dot_r],
+                 fill=dot)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# ICONS
+# ══════════════════════════════════════════════════════════════════════════
+
+def _pause(d, cx, cy, col):
+    bw, bh = 7, 22
+    d.rounded_rectangle([cx-bw-3, cy-bh//2, cx-3,    cy+bh//2], radius=3, fill=col)
+    d.rounded_rectangle([cx+3,    cy-bh//2, cx+bw+3, cy+bh//2], radius=3, fill=col)
+
+def _play(d, cx, cy, col):
+    d.polygon([(cx-9,cy-16),(cx-9,cy+16),(cx+16,cy)], fill=col)
+
+def _prev_icon(d, cx, cy, col):
+    d.rounded_rectangle([cx-14,cy-12,cx-10,cy+12], radius=2, fill=col)
+    d.polygon([(cx-9,cy),(cx+10,cy-12),(cx+10,cy+12)], fill=col)
+
+def _next_icon(d, cx, cy, col):
+    d.rounded_rectangle([cx+10,cy-12,cx+14,cy+12], radius=2, fill=col)
+    d.polygon([(cx+9,cy),(cx-10,cy-12),(cx-10,cy+12)], fill=col)
+
+def _shuffle(d, cx, cy, col):
+    d.line([(cx-14,cy-7),(cx-3,cy-7),(cx+14,cy+7)], fill=col, width=3)
+    d.line([(cx-14,cy+7),(cx-3,cy+7),(cx+14,cy-7)], fill=col, width=3)
+    d.polygon([(cx+14,cy+7),(cx+8,cy+4),(cx+11,cy+12)],  fill=col)
+    d.polygon([(cx+14,cy-7),(cx+8,cy-12),(cx+11,cy-4)],  fill=col)
+
+def _repeat(d, cx, cy, col):
+    d.arc([cx-11,cy-9,cx+11,cy+9], start=210, end=330, fill=col, width=3)
+    d.arc([cx-11,cy-9,cx+11,cy+9], start=30,  end=150, fill=col, width=3)
+    d.polygon([(cx+11,cy),(cx+6,cy-8),(cx+16,cy-8)],  fill=col)
+    d.polygon([(cx-11,cy),(cx-6,cy+8),(cx-16,cy+8)],  fill=col)
+
+def _heart(d, cx, cy, col):
+    d.ellipse([cx-10,cy-8,cx,    cy+4], fill=col)
+    d.ellipse([cx,   cy-8,cx+10, cy+4], fill=col)
+    d.polygon([(cx-13,cy),(cx,cy+14),(cx+13,cy)], fill=col)
+
+def _volume(d, cx, cy, col):
+    d.polygon([(cx-10,cy-5),(cx-4,cy-5),(cx+2,cy-10),
+               (cx+2,cy+10),(cx-4,cy+5),(cx-10,cy+5)], fill=col)
+    d.arc([cx+2,cy-8, cx+12,cy+8],   start=-55, end=55, fill=col, width=2)
+    d.arc([cx+4,cy-13,cx+18,cy+13],  start=-55, end=55, fill=col, width=2)
+
+def _eq(draw, x, y, col, h=(9,16,11,7,14)):
+    bw, gap, mh = 3, 2, max(h)
+    for i, hh in enumerate(h):
+        bx = x + i*(bw+gap)
+        draw.rounded_rectangle([bx, y+(mh-hh), bx+bw, y+mh], radius=1, fill=col)
+
+def _fmt(s: int) -> str:
+    return f"{s//60}:{s%60:02d}"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# ART SCRIM + TEXT
+# ══════════════════════════════════════════════════════════════════════════
+
+def _art_text(canvas, title, artist, ax, ay, sz):
+    d = ImageDraw.Draw(canvas, "RGBA")
+    scrim = sz // 3 + 16
+    for i in range(scrim):
+        a = int(215 * (i/scrim)**1.35)
+        d.rectangle([ax, ay+sz-scrim+i, ax+sz, ay+sz-scrim+i+1],
+                    fill=(0, 0, 0, a))
+    ty   = ay + sz - scrim + 14
+    f_b  = _font(22, bold=True)
+    f_s  = _font(14)
+    for word in title.upper().split():
+        d.text((ax+18, ty), word, font=f_b, fill=WHITE)
+        ty += 28
+    d.text((ax+18, ty+4), artist, font=f_s, fill=(200,200,200))
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# CORE GENERATOR FUNCTION
+# ══════════════════════════════════════════════════════════════════════════
+
+def generate_thumbnail(
+    title: str,
+    artist: str,
+    album_art,
+    current_sec: int,
+    duration_sec: int,
+    output_path: str  = "thumbnail.png",
+    source_label: str = "PLAYING FROM ALBUM",
+    is_playing: bool  = True,
+) -> str:
+
+    # ── load art ────────────────────────────────────────────────────────
+    if isinstance(album_art, Image.Image):
+        art = album_art.convert("RGBA")
+    elif isinstance(album_art, (str, Path)) and str(album_art).startswith(("http://","https://")):
+        with urllib.request.urlopen(str(album_art)) as r:
+            art = Image.open(io.BytesIO(r.read())).convert("RGBA")
+    else:
+        art = Image.open(album_art).convert("RGBA")
+
+    art_sq = art.resize((ART_SIZE, ART_SIZE), Image.LANCZOS)
+
+    canvas = _make_bg(art_sq)
+
+    # main glass card
+    _glass_rect(canvas,
+                CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
+                r=CARD_R, blur=26,
+                tint_alpha=14, border_alpha=100,
+                shine_alpha=90, inner_alpha=35, border_w=2)
+
+    # album art
+    mask_art = _rounded_mask((ART_SIZE, ART_SIZE), ART_R)
+    canvas.paste(art_sq.convert("RGBA"), (ART_X, ART_Y), mask_art)
+
+    d = ImageDraw.Draw(canvas, "RGBA")
+    d.rounded_rectangle([ART_X-2, ART_Y-2, ART_X+ART_SIZE+2, ART_Y+ART_SIZE+2],
+                        radius=ART_R+2, outline=(255,255,255,80), width=2)
+    d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
+                        radius=ART_R+1, outline=(255,255,255,30), width=1)
+
+    _art_text(canvas, title, artist, ART_X, ART_Y, ART_SIZE)
+
+    # right panel
+    d = ImageDraw.Draw(canvas, "RGBA")
+    iy = CARD_Y + 48
+
+    _eq(d, INFO_X, iy+3, GREEN)
+    d.text((INFO_X+38, iy), source_label, font=_font(13), fill=(*LGRAY, 210))
+    iy += 38
+
+    f_ttl  = _font(50, bold=True)
+    max_ch = max(1, int(INFO_W / 27))
+    lines  = textwrap.wrap(title, width=max_ch)[:2]
+    for ln in lines:
+        d.text((INFO_X, iy), ln, font=f_ttl, fill=WHITE)
+        bb = d.textbbox((INFO_X, iy), ln, font=f_ttl)
+        iy += bb[3] - bb[1] + 4
+    iy += 6
+
+    f_art = _font(22)
+    d.text((INFO_X, iy), artist, font=f_art, fill=LGRAY)
+    ab = d.textbbox((INFO_X, iy), artist, font=f_art)
+    bx  = ab[2] + 14
+    by  = iy + (ab[3]-ab[1])//2
+    d.ellipse([bx-12, by-12, bx+12, by+12], fill=(*GREEN, 40))
+    d.ellipse([bx-10, by-10, bx+10, by+10], fill=GREEN)
+    d.text((bx-5, by-8), "✓", font=_font(13, bold=True), fill=(10,10,10))
+
+    rx  = CARD_X + CARD_W - 36
+    ry  = CARD_Y + 48
+    _glass_pill(canvas, rx-64, ry, 52, 38, r=19,
+                tint_alpha=20, border_alpha=85, shine_alpha=60)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    _heart(d, rx-64, ry, GREEN)
+    _glass_pill(canvas, rx-4, ry, 52, 38, r=19,
+                tint_alpha=20, border_alpha=85, shine_alpha=60)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    d.text((rx-22, ry-10), "···", font=_font(22, bold=True), fill=LGRAY)
+
+    iy += 50
+
+    # progress bar
+    pct   = current_sec / max(1, duration_sec)
+    bar_y = iy + 18
+    d = ImageDraw.Draw(canvas, "RGBA")
+    _bar(d, INFO_X, bar_y, INFO_W, 5, pct,
+         track=(255,255,255,40), fill=GREEN, dot=WHITE, dot_r=8)
+
+    iy = bar_y + 34
+    f_t = _font(16)
+    d.text((INFO_X, iy), _fmt(current_sec), font=f_t, fill=LGRAY)
+    tw  = d.textbbox((0,0), _fmt(duration_sec), font=f_t)
+    d.text((INFO_X+INFO_W-(tw[2]-tw[0]), iy), _fmt(duration_sec),
+           font=f_t, fill=LGRAY)
+
+    iy += 52
+
+    # transport controls
+    ctrl_y = iy + 6
+    mid    = INFO_X + INFO_W // 2
+    sp     = 74
+
+    d = ImageDraw.Draw(canvas, "RGBA")
+    _shuffle(d, mid - sp*2, ctrl_y, LGRAY)
+    d.ellipse([mid-sp*2-3, ctrl_y+23, mid-sp*2+3, ctrl_y+29], fill=GREEN)
+    _prev_icon(d, mid - sp, ctrl_y, WHITE)
+
+    _glass_pill(canvas, mid, ctrl_y, 78, 78, r=39,
+                tint_alpha=210, border_alpha=200, shine_alpha=130)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    fn = _pause if is_playing else _play
+    fn(d, mid, ctrl_y, (12, 12, 22))
+
+    _next_icon(d, mid + sp, ctrl_y, WHITE)
+    _repeat(d, mid + sp*2, ctrl_y, LGRAY)
+    d.ellipse([mid+sp*2-3, ctrl_y+23, mid+sp*2+3, ctrl_y+29], fill=GREEN)
+
+    # volume strip
+    bot_y = CARD_Y + CARD_H - 60
+    _glass_rect(canvas,
+                INFO_X - 12, bot_y,
+                CARD_X + CARD_W - 12, bot_y + 46,
+                r=23, blur=18,
+                tint_alpha=12, border_alpha=80,
+                shine_alpha=55, inner_alpha=22, border_w=1)
+
+    d = ImageDraw.Draw(canvas, "RGBA")
+    vx, vy = INFO_X+4, bot_y+23
+    _volume(d, vx, vy, LGRAY)
+    vol_x = vx + 30
+    vol_w = INFO_W - 108
+    _bar(d, vol_x, vy-3, vol_w, 4, 0.52,
+         track=(255,255,255,38), fill=TEAL, dot=WHITE, dot_r=7)
+
+    ri = CARD_X + CARD_W - 22
+    for sym in ["⊞", "⊡", "⤢"]:
+        d.text((ri-24, bot_y+14), sym, font=_font(18), fill=LGRAY)
+        ri -= 40
+
+    # header UPGRADE pill
+    _glass_pill(canvas, W-126, 30, 90, 30, r=15,
+                tint_alpha=16, border_alpha=80, shine_alpha=55)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    d.text((W-164, 19), "UPGRADE", font=_font(13, bold=True), fill=WHITE)
+    d.text((W-60,  18), "🔔",      font=_font(18),             fill=LGRAY)
+    d.text((W-28,  18), "···",     font=_font(18, bold=True),  fill=LGRAY)
+
+    canvas.convert("RGB").save(output_path, "PNG", optimize=True)
+    return output_path
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# THUMBNAIL CLASS — wraps generate_thumbnail() for bot usage
+# ══════════════════════════════════════════════════════════════════════════
+
+class Thumbnail:
+    """
+    Glassmorphism thumbnail generator.
+
+    Usage in your bot:
+        thumb = Thumbnail()
+        path = await thumb.generate(
+            title="Song Name",
+            artist="Artist",
+            album_art="path/to/cover.jpg",   # file path, URL, or PIL Image
+            current_sec=92,
+            duration_sec=227,
+            output_path="thumb.png",
+            is_playing=True,
+        )
+    """
+
+    async def generate(
+        self,
+        title: str,
+        artist: str,
+        album_art,
+        current_sec: int = 0,
+        duration_sec: int = 1,
+        output_path: str  = "thumb.png",
+        source_label: str = "PLAYING FROM ALBUM",
+        is_playing: bool  = True,
+    ) -> str:
+        """Generate a Spotify-style glassmorphism thumbnail and return its path."""
+        return generate_thumbnail(
+            title        = title,
+            artist       = artist,
+            album_art    = album_art,
+            current_sec  = current_sec,
+            duration_sec = duration_sec,
+            output_path  = output_path,
+            source_label = source_label,
+            is_playing   = is_playing,
+        )
+
+    # Sync alias for callers that don't await
+    def generate_sync(self, *args, **kwargs) -> str:
+        return generate_thumbnail(*args, **kwargs)
+
