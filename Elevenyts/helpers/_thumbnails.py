@@ -14,6 +14,22 @@
 # of this source code without permission is prohibited.
 # ==========================================================
 
+# ==========================================================
+# Copyright (c) 2026 VelocityBots
+# All Rights Reserved.
+#
+# Project      : VelocityBots API Telegram Music Bot
+# Powered By   : VelocityBots
+# Type         : API Based Telegram Music Bot
+#
+# Bot          : @JunoXmusic_Robot
+# Channel      : https://t.me/junoxmusic_updates
+# GitHub       : https://github.com/bishalkumarsahh-eng
+#
+# Unauthorized copying, modification, or redistribution
+# of this source code without permission is prohibited.
+# ==========================================================
+
 import asyncio
 import io
 import os
@@ -76,11 +92,20 @@ def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
 # ════════════════════════════════════════════════════════════════════════════
 
 def _make_bg(art: Image.Image) -> Image.Image:
-    bg = art.convert("RGB").resize((W, H), Image.LANCZOS)
-    for r in (22, 22, 14):
-        bg = bg.filter(ImageFilter.GaussianBlur(radius=r))
-    dark = Image.new("RGB", (W, H), (4, 4, 14))
-    bg   = Image.blend(bg, dark, alpha=0.52)
+    # Fill canvas by cover-cropping the art so no letter-boxing
+    aw, ah = art.size
+    scale  = max(W / aw, H / ah)
+    nw, nh = int(aw * scale), int(ah * scale)
+    bg     = art.convert("RGB").resize((nw, nh), Image.LANCZOS)
+    ox, oy = (nw - W) // 2, (nh - H) // 2
+    bg     = bg.crop((ox, oy, ox + W, oy + H))
+
+    # Light blur — keeps colour and depth visible
+    bg = bg.filter(ImageFilter.GaussianBlur(radius=8))
+
+    # Light dark tint — keep colours vibrant
+    dark = Image.new("RGB", (W, H), (4, 4, 18))
+    bg   = Image.blend(bg, dark, alpha=0.32)
     return bg.convert("RGBA")
 
 
@@ -262,7 +287,7 @@ def _render(art: Image.Image, title: str, artist: str,
             source_label: str = "PLAYING FROM ALBUM") -> Image.Image:
 
     art_sq = art.resize((ART_SIZE, ART_SIZE), Image.LANCZOS)
-    canvas = _make_bg(art_sq)
+    canvas = _make_bg(art)          # use original (full-res) art for background
 
     # main glass card
     _glass_rect(canvas, CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
