@@ -311,12 +311,6 @@ def _render(art: Image.Image, title: str, artist: str,
     # artist + verified badge
     f_art = _font(22)
     d.text((INFO_X, iy), artist, font=f_art, fill=LGRAY)
-    ab  = d.textbbox((INFO_X, iy), artist, font=f_art)
-    bx  = ab[2] + 14
-    by  = iy + (ab[3]-ab[1])//2
-    d.ellipse([bx-12, by-12, bx+12, by+12], fill=(*GREEN, 40))
-    d.ellipse([bx-10, by-10, bx+10, by+10], fill=GREEN)
-    d.text((bx-5, by-8), "✓", font=_font(13, bold=True), fill=(10,10,10))
 
     # heart + more pills
     rx = CARD_X + CARD_W - 36
