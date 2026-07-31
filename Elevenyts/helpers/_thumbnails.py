@@ -346,23 +346,23 @@ def _render(art: Image.Image, title: str, artist: str,
 
     iy += 52
 
-    # transport controls
+    # transport controls — bigger icons + larger play button
     ctrl_y = iy + 6
     mid    = INFO_X + INFO_W // 2
-    sp     = 74
+    sp     = 88                          # wider spacing between icons
     d = ImageDraw.Draw(canvas, "RGBA")
     _shuffle(d, mid - sp*2, ctrl_y, LGRAY)
-    d.ellipse([mid-sp*2-3, ctrl_y+23, mid-sp*2+3, ctrl_y+29], fill=GREEN)
+    d.ellipse([mid-sp*2-4, ctrl_y+28, mid-sp*2+4, ctrl_y+36], fill=GREEN)
     _prev_icon(d, mid - sp, ctrl_y, WHITE)
 
-    _glass_pill(canvas, mid, ctrl_y, 78, 78, r=39,
+    _glass_pill(canvas, mid, ctrl_y, 96, 96, r=48,   # was 78×78
                 tint_alpha=210, border_alpha=200, shine_alpha=130)
     d = ImageDraw.Draw(canvas, "RGBA")
     (_pause if is_playing else _play)(d, mid, ctrl_y, (12,12,22))
 
     _next_icon(d, mid + sp, ctrl_y, WHITE)
     _repeat(d, mid + sp*2, ctrl_y, LGRAY)
-    d.ellipse([mid+sp*2-3, ctrl_y+23, mid+sp*2+3, ctrl_y+29], fill=GREEN)
+    d.ellipse([mid+sp*2-4, ctrl_y+28, mid+sp*2+4, ctrl_y+36], fill=GREEN)
 
     # volume strip
     bot_y = CARD_Y + CARD_H - 60
@@ -383,7 +383,7 @@ def _render(art: Image.Image, title: str, artist: str,
     _glass_pill(canvas, W-140, 30, 130, 32, r=16,
                 tint_alpha=16, border_alpha=80, shine_alpha=55)
     d = ImageDraw.Draw(canvas, "RGBA")
-    d.text((W-178, 16), "VelocityBots", font=_font(17, bold=True), fill=WHITE)
+    d.text((W-188, 14), "VelocityBots", font=_font(21, bold=True), fill=WHITE)
     d.text((W-60,  18), "🔔",           font=_font(18),            fill=LGRAY)
     d.text((W-28,  18), "···",          font=_font(18, bold=True), fill=LGRAY)
 
