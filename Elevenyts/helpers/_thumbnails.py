@@ -14,22 +14,6 @@
 # of this source code without permission is prohibited.
 # ==========================================================
 
-# ==========================================================
-# Copyright (c) 2026 VelocityBots
-# All Rights Reserved.
-#
-# Project      : VelocityBots API Telegram Music Bot
-# Powered By   : VelocityBots
-# Type         : API Based Telegram Music Bot
-#
-# Bot          : @JunoXmusic_Robot
-# Channel      : https://t.me/junoxmusic_updates
-# GitHub       : https://github.com/bishalkumarsahh-eng
-#
-# Unauthorized copying, modification, or redistribution
-# of this source code without permission is prohibited.
-# ==========================================================
-
 import asyncio
 import io
 import os
@@ -101,9 +85,9 @@ def _make_bg(art: Image.Image) -> Image.Image:
     bg     = bg.crop((ox, oy, ox + W, oy + H))
 
     # Light blur — keeps colour and depth visible
-    bg = bg.filter(ImageFilter.GaussianBlur(radius=8))
+    bg = bg.filter(ImageFilter.GaussianBlur(radius=4))
 
-    # Light dark tint — keep colours vibrant
+    # Light dark tint — keep colours vibrant (was 0.52, now 0.32)
     dark = Image.new("RGB", (W, H), (4, 4, 18))
     bg   = Image.blend(bg, dark, alpha=0.32)
     return bg.convert("RGBA")
@@ -302,7 +286,7 @@ def _render(art: Image.Image, title: str, artist: str,
                         radius=ART_R+2, outline=(255,255,255,80), width=2)
     d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
                         radius=ART_R+1, outline=(255,255,255,30), width=1)
-    _art_scrim(canvas, title, artist, ART_X, ART_Y, ART_SIZE)
+    # no scrim — album art stays clean like the reference
 
     # right panel
     d  = ImageDraw.Draw(canvas, "RGBA")
