@@ -32,16 +32,16 @@ from Elevenyts.helpers import Track
 W, H = 1280, 720
 
 # ── card geometry ─────────────────────────────────────────────────────────────
-CARD_X, CARD_Y = 52, 68
-CARD_W, CARD_H = W - 104, H - 136
-CARD_R         = 38
+CARD_X, CARD_Y = 90, 60
+CARD_W, CARD_H = W - 180, H - 120
+CARD_R         = 45
 
-ART_SIZE = CARD_H - 48
-ART_X    = CARD_X + 24
-ART_Y    = CARD_Y + 24
-ART_R    = 26
+ART_SIZE = 420
+ART_X    = 130
+ART_Y    = 110
+ART_R    = 35
 
-INFO_X  = ART_X + ART_SIZE + 56
+INFO_X  = 650
 INFO_W  = CARD_X + CARD_W - INFO_X - 36
 
 # ── colour palette ────────────────────────────────────────────────────────────
@@ -82,9 +82,9 @@ def _make_bg(art: Image.Image) -> Image.Image:
     bg     = art.convert("RGB").resize((nw, nh), Image.LANCZOS)
     ox, oy = (nw - W) // 2, (nh - H) // 2
     bg     = bg.crop((ox, oy, ox + W, oy + H))
-    bg     = bg.filter(ImageFilter.GaussianBlur(radius=2))
-    dark   = Image.new("RGB", (W, H), (4, 4, 18))
-    bg     = Image.blend(bg, dark, alpha=0.32)
+    bg     = bg.filter(ImageFilter.GaussianBlur(radius=35))
+    dark   = Image.new("RGB", (W, H), (0, 0, 0))
+    bg     = Image.blend(bg, dark, alpha=0.55)
     return bg.convert("RGBA")
 
 
@@ -247,15 +247,15 @@ def _render(art: Image.Image, title: str, artist: str,
 
     # main glass card
     _glass_rect(canvas, CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
-                r=CARD_R, blur=10, tint_alpha=14, border_alpha=100,
-                shine_alpha=90, inner_alpha=35, border_w=2)
+                r=CARD_R, blur=30, tint_alpha=25, border_alpha=50,
+                shine_alpha=50, inner_alpha=15, border_w=1)
 
     # album art — clean, no scrim
     mask_art = _rounded_mask((ART_SIZE, ART_SIZE), ART_R)
     canvas.paste(art_sq.convert("RGBA"), (ART_X, ART_Y), mask_art)
     d = ImageDraw.Draw(canvas, "RGBA")
     d.rounded_rectangle([ART_X-2, ART_Y-2, ART_X+ART_SIZE+2, ART_Y+ART_SIZE+2],
-                        radius=ART_R+2, outline=(255,255,255,80), width=2)
+                        radius=ART_R+2, outline=(255,255,255,30), width=2)
     d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
                         radius=ART_R+1, outline=(255,255,255,30), width=1)
 
@@ -320,8 +320,8 @@ def _render(art: Image.Image, title: str, artist: str,
     d.ellipse([mid-sp*2-4, ctrl_y+28, mid-sp*2+4, ctrl_y+36], fill=GREEN)
     _prev_icon(d, mid - sp, ctrl_y, WHITE)
 
-    _glass_pill(canvas, mid, ctrl_y, 96, 96, r=48,
-                tint_alpha=210, border_alpha=200, shine_alpha=130)
+    _glass_pill(canvas, mid, ctrl_y, 112, 112, r=56,
+                tint_alpha=230, border_alpha=200, shine_alpha=100)
     d = ImageDraw.Draw(canvas, "RGBA")
     (_pause if is_playing else _play)(d, mid, ctrl_y, (12,12,22))
 
