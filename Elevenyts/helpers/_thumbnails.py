@@ -28,10 +28,10 @@ from Elevenyts import config
 from Elevenyts.helpers import Track
 
 
-# ── canvas ──────────────────────────────────────────────────────────────────
+# ── canvas ───────────────────────────────────────────────────────────────────
 W, H = 1280, 720
 
-# ── card geometry ────────────────────────────────────────────────────────────
+# ── card geometry ─────────────────────────────────────────────────────────────
 CARD_X, CARD_Y = 52, 68
 CARD_W, CARD_H = W - 104, H - 136
 CARD_R         = 38
@@ -50,7 +50,7 @@ TEAL   = (20,  220, 160)
 WHITE  = (255, 255, 255)
 LGRAY  = (200, 200, 215)
 
-# ── font paths (match originals, fallback to system fonts) ───────────────────
+# ── font paths ────────────────────────────────────────────────────────────────
 _FONT_BOLD    = "Elevenyts/helpers/Raleway-Bold.ttf"
 _FONT_REGULAR = "Elevenyts/helpers/Inter-Light.ttf"
 
@@ -76,20 +76,15 @@ def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
 # ════════════════════════════════════════════════════════════════════════════
 
 def _make_bg(art: Image.Image) -> Image.Image:
-    # Fill canvas by cover-cropping the art so no letter-boxing
     aw, ah = art.size
     scale  = max(W / aw, H / ah)
     nw, nh = int(aw * scale), int(ah * scale)
     bg     = art.convert("RGB").resize((nw, nh), Image.LANCZOS)
     ox, oy = (nw - W) // 2, (nh - H) // 2
     bg     = bg.crop((ox, oy, ox + W, oy + H))
-
-    # Light blur — keeps colour and depth visible
-    bg = bg.filter(ImageFilter.GaussianBlur(radius=2))
-
-    # Light dark tint — keep colours vibrant (was 0.52, now 0.32)
-    dark = Image.new("RGB", (W, H), (4, 4, 18))
-    bg   = Image.blend(bg, dark, alpha=0.32)
+    bg     = bg.filter(ImageFilter.GaussianBlur(radius=2))
+    dark   = Image.new("RGB", (W, H), (4, 4, 18))
+    bg     = Image.blend(bg, dark, alpha=0.32)
     return bg.convert("RGBA")
 
 
@@ -107,12 +102,9 @@ def _rounded_mask(size, r: int) -> Image.Image:
 def _glass_rect(canvas, x0, y0, x1, y1, r,
                 blur=22, tint_alpha=18, border_alpha=90,
                 shine_alpha=80, inner_alpha=30, border_w=2):
-    w, h  = x1-x0, y1-y0
-    mask  = _rounded_mask((w, h), r)
-
+    w, h    = x1-x0, y1-y0
     region  = canvas.crop((x0, y0, x1, y1)).convert("RGBA")
     blurred = region.filter(ImageFilter.GaussianBlur(radius=blur))
-
     tint    = Image.new("RGBA", (w, h), (255, 255, 255, tint_alpha))
     blurred = Image.alpha_composite(blurred, tint)
 
@@ -127,6 +119,7 @@ def _glass_rect(canvas, x0, y0, x1, y1, r,
         sd.line([(int(w*.10), i), (int(w*.70), i)], fill=(255, 255, 255, a))
     blurred = Image.alpha_composite(blurred, shine)
 
+    mask  = _rounded_mask((w, h), r)
     frame = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     frame.paste(blurred, mask=mask)
     canvas.alpha_composite(frame, (x0, y0))
@@ -153,7 +146,7 @@ def _glass_pill(canvas, cx, cy, pw, ph, r=None,
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# PROGRESS BAR + ICONS
+# ICONS & CONTROLS
 # ════════════════════════════════════════════════════════════════════════════
 
 def _bar(draw, x, y, w, h, pct,
@@ -166,7 +159,6 @@ def _bar(draw, x, y, w, h, pct,
     draw.ellipse([cx2-dot_r-4, cy2-dot_r-4, cx2+dot_r+4, cy2+dot_r+4], fill=(*dot[:3], 50))
     draw.ellipse([cx2-dot_r-1, cy2-dot_r-1, cx2+dot_r+1, cy2+dot_r+1], fill=(*dot[:3], 90))
     draw.ellipse([cx2-dot_r,   cy2-dot_r,   cx2+dot_r,   cy2+dot_r],   fill=dot)
-
 
 def _pause(d, cx, cy, col):
     bw, bh = 7, 22
@@ -214,33 +206,13 @@ def _eq(draw, x, y, col, h=(9,16,11,7,14)):
         draw.rounded_rectangle([bx, y+(mh-hh), bx+bw, y+mh], radius=1, fill=col)
 
 def _fmt(s) -> str:
-    """Format seconds int OR pass-through a string like '3:47' or '🔴 LIVE'."""
     if isinstance(s, int):
         return f"{s//60}:{s%60:02d}"
     return str(s) if s else "0:00"
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# ART PANEL — scrim + title text overlay on album art
-# ════════════════════════════════════════════════════════════════════════════
-
-def _art_scrim(canvas, title, artist, ax, ay, sz):
-    d     = ImageDraw.Draw(canvas, "RGBA")
-    scrim = sz // 3 + 16
-    for i in range(scrim):
-        a = int(215 * (i/scrim)**1.35)
-        d.rectangle([ax, ay+sz-scrim+i, ax+sz, ay+sz-scrim+i+1], fill=(0,0,0,a))
-    ty  = ay + sz - scrim + 14
-    f_b = _font(22, bold=True)
-    f_s = _font(14)
-    for word in title.upper().split():
-        d.text((ax+18, ty), word, font=f_b, fill=WHITE)
-        ty += 28
-    d.text((ax+18, ty+4), artist, font=f_s, fill=(200,200,200))
-
-
-# ════════════════════════════════════════════════════════════════════════════
-# PLACEHOLDER — used when no thumbnail URL is available
+# PLACEHOLDER
 # ════════════════════════════════════════════════════════════════════════════
 
 def _placeholder() -> Image.Image:
@@ -271,14 +243,14 @@ def _render(art: Image.Image, title: str, artist: str,
             source_label: str = "PLAYING FROM ALBUM") -> Image.Image:
 
     art_sq = art.resize((ART_SIZE, ART_SIZE), Image.LANCZOS)
-    canvas = _make_bg(art)          # use original (full-res) art for background
+    canvas = _make_bg(art)
 
     # main glass card
     _glass_rect(canvas, CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
                 r=CARD_R, blur=26, tint_alpha=14, border_alpha=100,
                 shine_alpha=90, inner_alpha=35, border_w=2)
 
-    # album art
+    # album art — clean, no scrim
     mask_art = _rounded_mask((ART_SIZE, ART_SIZE), ART_R)
     canvas.paste(art_sq.convert("RGBA"), (ART_X, ART_Y), mask_art)
     d = ImageDraw.Draw(canvas, "RGBA")
@@ -286,29 +258,28 @@ def _render(art: Image.Image, title: str, artist: str,
                         radius=ART_R+2, outline=(255,255,255,80), width=2)
     d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
                         radius=ART_R+1, outline=(255,255,255,30), width=1)
-    # no scrim — album art stays clean like the reference
 
     # right panel
     d  = ImageDraw.Draw(canvas, "RGBA")
     iy = CARD_Y + 48
 
-    # source label row
+    # source label
     _eq(d, INFO_X, iy+3, GREEN)
     label = "🔴  LIVE" if is_live else source_label
     d.text((INFO_X+38, iy), label, font=_font(13), fill=(*LGRAY, 210))
     iy += 38
 
-    # song title (up to 2 lines)
-    f_ttl  = _font(50, bold=True)
-    max_ch = max(1, int(INFO_W / 27))
-    lines  = textwrap.wrap(title, width=max_ch)[:2]
+    # song title — up to 3 lines so full name always shows
+    f_ttl  = _font(42, bold=True)
+    max_ch = max(1, int(INFO_W / 22))
+    lines  = textwrap.wrap(title, width=max_ch)[:3]
     for ln in lines:
         d.text((INFO_X, iy), ln, font=f_ttl, fill=WHITE)
         bb = d.textbbox((INFO_X, iy), ln, font=f_ttl)
         iy += bb[3] - bb[1] + 4
     iy += 6
 
-    # artist + verified badge
+    # artist name
     f_art = _font(22)
     d.text((INFO_X, iy), artist, font=f_art, fill=LGRAY)
 
@@ -324,7 +295,7 @@ def _render(art: Image.Image, title: str, artist: str,
 
     iy += 50
 
-    # progress bar (fixed at ~40% for static thumbnail)
+    # progress bar
     bar_y = iy + 18
     d = ImageDraw.Draw(canvas, "RGBA")
     _bar(d, INFO_X, bar_y, INFO_W, 5, 0.40,
@@ -340,16 +311,16 @@ def _render(art: Image.Image, title: str, artist: str,
 
     iy += 52
 
-    # transport controls — bigger icons + larger play button
+    # transport controls
     ctrl_y = iy + 6
     mid    = INFO_X + INFO_W // 2
-    sp     = 88                          # wider spacing between icons
+    sp     = 88
     d = ImageDraw.Draw(canvas, "RGBA")
     _shuffle(d, mid - sp*2, ctrl_y, LGRAY)
     d.ellipse([mid-sp*2-4, ctrl_y+28, mid-sp*2+4, ctrl_y+36], fill=GREEN)
     _prev_icon(d, mid - sp, ctrl_y, WHITE)
 
-    _glass_pill(canvas, mid, ctrl_y, 96, 96, r=48,   # was 78×78
+    _glass_pill(canvas, mid, ctrl_y, 96, 96, r=48,
                 tint_alpha=210, border_alpha=200, shine_alpha=130)
     d = ImageDraw.Draw(canvas, "RGBA")
     (_pause if is_playing else _play)(d, mid, ctrl_y, (12,12,22))
@@ -373,7 +344,7 @@ def _render(art: Image.Image, title: str, artist: str,
         d.text((ri-24, bot_y+14), sym, font=_font(18), fill=LGRAY)
         ri -= 40
 
-    # UPGRADE pill
+    # VelocityBots pill
     _glass_pill(canvas, W-140, 30, 130, 32, r=16,
                 tint_alpha=16, border_alpha=80, shine_alpha=55)
     d = ImageDraw.Draw(canvas, "RGBA")
@@ -385,7 +356,7 @@ def _render(art: Image.Image, title: str, artist: str,
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# THUMBNAIL CLASS — exact same public API as the original
+# THUMBNAIL CLASS
 # ════════════════════════════════════════════════════════════════════════════
 
 class Thumbnail:
@@ -398,10 +369,6 @@ class Thumbnail:
         return output_path
 
     async def generate(self, song: Track, size=(1280, 720)) -> str:
-        """
-        Drop-in replacement — same signature as the original.
-        Returns the path to the generated PNG, or config.DEFAULT_THUMB on error.
-        """
         try:
             os.makedirs("cache", exist_ok=True)
             output = f"cache/{song.id}_ultra.png"
@@ -409,8 +376,6 @@ class Thumbnail:
             if os.path.exists(output):
                 return output
 
-            # download thumbnail
-            art: Image.Image
             if getattr(song, "thumbnail", None):
                 temp = f"cache/temp_{song.id}.jpg"
                 try:
@@ -426,7 +391,6 @@ class Thumbnail:
             else:
                 art = _placeholder().convert("RGBA")
 
-            # extract metadata
             title    = re.sub(r"\s+", " ",
                               str(getattr(song, "title", "") or "Now Playing")).strip() \
                        or "Now Playing"
