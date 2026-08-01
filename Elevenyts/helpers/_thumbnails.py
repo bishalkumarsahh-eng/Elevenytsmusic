@@ -36,12 +36,12 @@ CARD_X, CARD_Y = 90, 60
 CARD_W, CARD_H = W - 180, H - 120
 CARD_R         = 45
 
-ART_SIZE = 420
-ART_X    = 130
-ART_Y    = 110
-ART_R    = 35
+ART_SIZE = 520
+ART_X    = 80
+ART_Y    = 100
+ART_R    = 45
 
-INFO_X  = 650
+INFO_X  = 700
 INFO_W  = CARD_X + CARD_W - INFO_X - 36
 
 # ── colour palette ────────────────────────────────────────────────────────────
@@ -255,7 +255,7 @@ def _render(art: Image.Image, title: str, artist: str,
     canvas.paste(art_sq.convert("RGBA"), (ART_X, ART_Y), mask_art)
     d = ImageDraw.Draw(canvas, "RGBA")
     d.rounded_rectangle([ART_X-2, ART_Y-2, ART_X+ART_SIZE+2, ART_Y+ART_SIZE+2],
-                        radius=ART_R+2, outline=(255,255,255,30), width=2)
+                        radius=ART_R+2, outline=(255,255,255,25), width=2)
     d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
                         radius=ART_R+1, outline=(255,255,255,30), width=1)
 
