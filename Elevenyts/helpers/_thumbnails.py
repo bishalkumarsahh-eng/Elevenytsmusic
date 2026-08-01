@@ -247,7 +247,7 @@ def _render(art: Image.Image, title: str, artist: str,
 
     # main glass card
     _glass_rect(canvas, CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
-                r=CARD_R, blur=26, tint_alpha=14, border_alpha=100,
+                r=CARD_R, blur=10, tint_alpha=14, border_alpha=100,
                 shine_alpha=90, inner_alpha=35, border_w=2)
 
     # album art — clean, no scrim
