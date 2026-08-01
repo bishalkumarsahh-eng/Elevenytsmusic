@@ -32,13 +32,13 @@ from Elevenyts.helpers import Track
 W, H = 1280, 720
 
 # ── card geometry ─────────────────────────────────────────────────────────────
-CARD_X, CARD_Y = 90, 60
-CARD_W, CARD_H = W - 180, H - 120
+CARD_X, CARD_Y = 40, 10
+CARD_W, CARD_H = 1200, 700
 CARD_R         = 45
 
 ART_SIZE = 520
-ART_X    = 80
-ART_Y    = 100
+ART_X    = CARD_X + 35
+ART_Y    = CARD_Y + 35
 ART_R    = 45
 
 INFO_X  = 700
