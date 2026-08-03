@@ -20,3 +20,16 @@ def test_resolve_timeout_caps_values():
     assert yt._resolve_timeout(600, 10, 20) == 20
     assert yt._resolve_timeout(5, 10, 20) == 10
     assert yt._resolve_timeout(15, 10, 20) == 15
+
+
+def test_pick_stream_url_prefers_direct_audio_stream():
+    yt = YouTube()
+    info = {
+        "url": "https://cdn.example.com/stream/audio.mp3",
+        "formats": [
+            {"url": "https://cdn.example.com/slow.mp4", "vcodec": "avc1", "acodec": "none"},
+            {"url": "https://cdn.example.com/fast.m4a", "vcodec": "none", "acodec": "mp4a"},
+        ],
+    }
+
+    assert yt._pick_stream_url(info) == "https://cdn.example.com/stream/audio.mp3"

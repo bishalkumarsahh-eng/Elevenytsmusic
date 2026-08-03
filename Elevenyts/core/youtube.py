@@ -93,6 +93,35 @@ class YouTube:
             return min_timeout
         return max(min_timeout, min(requested_timeout, max_timeout))
 
+    def _pick_stream_url(self, info: dict) -> Optional[str]:
+        if not info:
+            return None
+
+        direct_url = info.get("url")
+        if direct_url:
+            return direct_url
+
+        preferred_formats = []
+        for fmt in info.get("formats", []) or []:
+            if not fmt.get("url"):
+                continue
+            if fmt.get("acodec") in {None, "none"}:
+                continue
+            if fmt.get("vcodec") not in {None, "none"}:
+                continue
+            preferred_formats.append(fmt)
+
+        if preferred_formats:
+            for fmt in preferred_formats:
+                if fmt.get("ext") in {"m4a", "mp4", "webm", "opus", "mp3", "ogg", "wav", "flac"}:
+                    return fmt["url"]
+            return preferred_formats[0]["url"]
+
+        for fmt in info.get("formats", []) or []:
+            if fmt.get("url") and fmt.get("acodec") != "none":
+                return fmt["url"]
+        return None
+
     def get_cookies(self):
         if not self.checked:
             cookies_dir = "Elevenyts/cookies"
@@ -515,12 +544,9 @@ class YouTube:
                         info = ydl.extract_info(self.base + video_id, download=False)
                         if not info:
                             return None
-                        direct = info.get("url")
-                        if direct:
-                            return direct
-                        for fmt in info.get("formats", []):
-                            if fmt.get("acodec") != "none" and fmt.get("url"):
-                                return fmt["url"]
+                        stream_url = self._pick_stream_url(info)
+                        if stream_url:
+                            return stream_url
                         return info.get("manifest_url")
                     except Exception as ex:
                         logger.error(f"Live stream extraction failed: {ex}")
