@@ -17,5 +17,5 @@ WORKDIR /app/
 RUN pip install -r requirements.txt
 
 # स्टार्ट कमांड
-CMD ["bash", "start"]
+CMD bash start
  

@@ -1,8 +1,2 @@
-#!/bin/bash
-set -e
+python3 -m Elevenyts
 
-echo "Starting Render health server..."
-python3 web.py &
-
-echo "Starting Elevenyts bot..."
-exec python3 -m Elevenyts
