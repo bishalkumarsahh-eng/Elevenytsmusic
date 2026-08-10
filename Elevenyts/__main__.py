@@ -18,7 +18,6 @@ import asyncio
 import importlib
 import os
 import sys
-import threading
 
 from pyrogram import idle
 
@@ -37,17 +36,9 @@ if sys.platform != "win32":
 from Elevenyts import (tune, app, config, db,
                    logger, stop, userbot, yt)
 from Elevenyts.plugins import all_modules
-from web import run_web
-
-
 
 async def main():
     try:
-        # Start Render web server immediately so health checks work even if bot startup fails.
-        web_thread = threading.Thread(target=run_web, daemon=True)
-        web_thread.start()
-        logger.info("🌐 Render web server started")
-
         # Step 1: Validate required environment variables
         try:
             config.check()
