@@ -46,6 +46,12 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
     
     def do_GET(self):
         """Handle GET requests"""
+        if self.path not in ("/", "/health", "/health/"):
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b'Not found')
+            return
         self.send_response(200)
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
@@ -60,23 +66,25 @@ def run_http_server():
     """Run a simple HTTP server for Render health checks"""
     port = int(os.environ.get("PORT", 8000))
     server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
+    server.allow_reuse_address = True
     logger.info(f"🌐 HTTP health check server started on port {port}")
     server.serve_forever()
 
 
 async def main():
     try:
-        # Step 1: Validate required environment variables
+        # Step 1: Start HTTP server immediately so Render can reach /health
+        # even while the bot is validating configuration or connecting to services.
+        http_thread = threading.Thread(target=run_http_server, daemon=True, name="render-health")
+        http_thread.start()
+        logger.info("🌐 HTTP server thread started for Render health checks")
+
+        # Step 2: Validate required environment variables
         try:
             config.check()
         except SystemExit as e:
             logger.error(str(e))
             return
-
-        # Step 2: Start HTTP server in a separate thread (for Render)
-        http_thread = threading.Thread(target=run_http_server, daemon=True)
-        http_thread.start()
-        logger.info("🌐 HTTP server thread started for Render health checks")
 
         # Step 3: Connect to MongoDB database
         await db.connect()

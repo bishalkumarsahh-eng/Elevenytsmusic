@@ -46,7 +46,8 @@ __version__ = "3.0.1"
 from config import Config
 
 config = Config()
-config.check()
+# Configuration validation is performed by Elevenyts.__main__.py after the
+# Render health-check server has started. Do not validate here during import.
 
 # Global task list for background tasks
 tasks: List = []
