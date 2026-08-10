@@ -1,8 +1,6 @@
 services:
   - type: web
     name: Elevenyts
-    runtime: python
-    buildCommand: pip install -U -r requirements.txt
-    startCommand: bash -c "python web.py & exec python -m Elevenyts"
+    runtime: docker
     healthCheckPath: /health
     plan: free
