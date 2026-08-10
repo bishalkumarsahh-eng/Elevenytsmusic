@@ -1,151 +1,80 @@
-# ==========================================================
-# Copyright (c) 2026 VelocityBots 
-# All Rights Reserved.
-#
-# Project      : VelocityBots API Telegram Music Bot
-# Powered By   : VelocityBots 
-# Type         : API Based Telegram Music Bot
-#
-# Bot          : @JunoXmusic_Robot
-# Channel      : https://t.me/junoxmusic_updates
-# GitHub       : https://github.com/bishalkumarsahh-eng
-#
-# Unauthorized copying, modification, or redistribution
-# of this source code without permission is prohibited.
-# ==========================================================
-
 import asyncio
 import importlib
+import logging
 import os
 import sys
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-from pyrogram import idle
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path in ("/", "/health", "/health/"):
+            body = b"Bot is running"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        else:
+            self.send_response(404)
+            self.end_headers()
+    def log_message(self, format, *args):
+        pass
 
-# Raise the file descriptor limit on Linux to avoid "[Errno 24] Too many open files"
-# when serving many groups concurrently (each audio stream + ffmpeg probe opens FDs).
+def run_http_server():
+    port = int(os.environ.get("PORT", "8000"))
+    server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    print(f"HTTP health server listening on port {port}", flush=True)
+    server.serve_forever()
+
+threading.Thread(target=run_http_server, daemon=True).start()
+
 if sys.platform != "win32":
     try:
         import resource
-        _soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-        _target = min(65536, _hard)
-        if _soft < _target:
-            resource.setrlimit(resource.RLIMIT_NOFILE, (_target, _hard))
+        soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        target = min(65536, hard)
+        if soft < target:
+            resource.setrlimit(resource.RLIMIT_NOFILE, (target, hard))
     except Exception:
         pass
 
-from Elevenyts import (tune, app, config, db,
-                   logger, stop, userbot, yt)
-from Elevenyts.plugins import all_modules
-
-
-# HTTP Server for Render health checks
-class HealthCheckHandler(BaseHTTPRequestHandler):
-    """Simple HTTP handler for Render health checks"""
-    
-    def do_GET(self):
-        """Handle GET requests"""
-        if self.path not in ("/", "/health", "/health/"):
-            self.send_response(404)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(b'Not found')
-            return
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-        self.end_headers()
-        self.wfile.write(b'Bot is running')
-    
-    def log_message(self, format, *args):
-        """Suppress log messages to keep console clean"""
-        pass
-
-
-def run_http_server():
-    """Run a simple HTTP server for Render health checks"""
-    port = int(os.environ.get("PORT", 8000))
-    server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
-    server.allow_reuse_address = True
-    logger.info(f"🌐 HTTP health check server started on port {port}")
-    server.serve_forever()
-
-
 async def main():
+    from pyrogram import idle
+    from Elevenyts import tune, app, config, db, logger, stop, userbot
+    from Elevenyts.plugins import all_modules
     try:
-        # Step 1: Start HTTP server immediately so Render can reach /health
-        # even while the bot is validating configuration or connecting to services.
-        http_thread = threading.Thread(target=run_http_server, daemon=True, name="render-health")
-        http_thread.start()
-        logger.info("🌐 HTTP server thread started for Render health checks")
-
-        # Step 2: Validate required environment variables
-        try:
-            config.check()
-        except SystemExit as e:
-            logger.error(str(e))
-            return
-
-        # Step 3: Connect to MongoDB database
+        config.check()
         await db.connect()
-        
-        # Step 4: Start the main bot client
         await app.boot()
-        
-        # Step 5: Start assistant/userbot clients (for joining voice chats)
         await userbot.boot()
-        
-        # Step 6: Initialize voice call handler
         await tune.boot()
-
-        # Step 7: Load all plugin modules (commands like /play, /pause, etc.)
         for module in all_modules:
             try:
                 importlib.import_module(f"Elevenyts.plugins.{module}")
             except Exception as e:
                 logger.error(f"Failed to load plugin {module}: {e}", exc_info=True)
-        logger.info(f"🔌 Loaded {len(all_modules)} plugin modules.")
-
-        # Step 8: Load sudo users and blacklisted users from database
+        logger.info(f"Loaded {len(all_modules)} plugin modules.")
         sudoers = await db.get_sudoers()
-        app.sudoers.update(sudoers)  # Add sudo users to set
-        app.sudo_filter.update(sudoers)  # Add sudo users to filter
-        app.bl_users.update(await db.get_blacklisted())  # Add blacklisted users to filter
-        logger.info(f"👑 Loaded {len(app.sudoers)} sudo users.")
-        logger.info("\n🎉 Bot started successfully! Ready to play music! 🎵\n")
-
-        # Step 9: Keep the bot running (press Ctrl+C to stop)
-        try:
-            await idle()
-        except KeyboardInterrupt:
-            logger.info("Received stop signal...")
-        except Exception as e:
-            logger.error(f"Error during idle: {e}", exc_info=True)
-        
-        # Step 10: Cleanup and shutdown when bot is stopped
-        await stop()
+        app.sudoers.update(sudoers)
+        app.sudo_filter.update(sudoers)
+        app.bl_users.update(await db.get_blacklisted())
+        logger.info(f"Loaded {len(app.sudoers)} sudo users.")
+        logger.info("Bot started successfully! Ready to play music!")
+        await idle()
+    except SystemExit as e:
+        print(f"Configuration error: {e}", flush=True)
     except Exception as e:
-        logger.error(f"Critical error in main: {e}", exc_info=True)
+        logging.exception("Critical error in main: %s", e)
         raise
-
+    finally:
+        try:
+            await stop()
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
+        asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Bot stopped by user (Ctrl+C)")
-    except SystemExit as e:
-        logger.error(f"Bot exited with system error: {e}")
-        raise
-    except Exception as e:
-        logger.error(f"Unexpected error caused bot to stop: {e}", exc_info=True)
-        # Don't raise - allow clean shutdown
-    finally:
-        # Ensure cleanup happens
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                loop.stop()
-        except:
-            pass
+        print("Bot stopped by user.", flush=True)
