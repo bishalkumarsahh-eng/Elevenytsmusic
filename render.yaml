@@ -17,6 +17,7 @@ services:
   - type: web
     name: Elevenyts
     runtime: python
-    buildCommand: pip install -U -r requirements.txt
+    buildCommand: apt-get update && apt-get install -y ffmpeg && pip install -U -r requirements.txt
     startCommand: python -m Elevenyts
     plan: free
+    healthCheckPath: /health
