@@ -14,7 +14,7 @@
 # of this source code without permission is prohibited.
 # ==========================================================
 services:
-  - type: worker
+  - type: web
     name: Elevenyts
     runtime: python
     buildCommand: pip install -U -r requirements.txt
