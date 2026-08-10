@@ -46,6 +46,7 @@ __version__ = "3.0.1"
 from config import Config
 
 config = Config()
+config.check()
 
 # Global task list for background tasks
 tasks: List = []
