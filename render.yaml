@@ -1,23 +1,8 @@
-# ==========================================================
-# Copyright (c) 2026 VelocityBots 
-# All Rights Reserved.
-#
-# Project      : VelocityBots API Telegram Music Bot
-# Powered By   : VelocityBots 
-# Type         : API Based Telegram Music Bot
-#
-# Bot          : @JunoXmusic_Robot
-# Channel      : https://t.me/junoxmusic_updates
-# GitHub       : https://github.com/bishalkumarsahh-eng
-#
-# Unauthorized copying, modification, or redistribution
-# of this source code without permission is prohibited.
-# ==========================================================
 services:
   - type: web
     name: Elevenyts
     runtime: python
-    buildCommand: apt-get update && apt-get install -y ffmpeg && pip install -U -r requirements.txt
+    buildCommand: pip install -U -r requirements.txt
     startCommand: python -m Elevenyts
-    plan: free
     healthCheckPath: /health
+    plan: free
