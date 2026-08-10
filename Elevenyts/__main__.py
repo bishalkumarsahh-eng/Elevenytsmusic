@@ -18,6 +18,8 @@ import asyncio
 import importlib
 import os
 import sys
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 from pyrogram import idle
 
@@ -37,6 +39,31 @@ from Elevenyts import (tune, app, config, db,
                    logger, stop, userbot, yt)
 from Elevenyts.plugins import all_modules
 
+
+# HTTP Server for Render health checks
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    """Simple HTTP handler for Render health checks"""
+    
+    def do_GET(self):
+        """Handle GET requests"""
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b'Bot is running')
+    
+    def log_message(self, format, *args):
+        """Suppress log messages to keep console clean"""
+        pass
+
+
+def run_http_server():
+    """Run a simple HTTP server for Render health checks"""
+    port = int(os.environ.get("PORT", 8000))
+    server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
+    logger.info(f"🌐 HTTP health check server started on port {port}")
+    server.serve_forever()
+
+
 async def main():
     try:
         # Step 1: Validate required environment variables
@@ -45,6 +72,11 @@ async def main():
         except SystemExit as e:
             logger.error(str(e))
             return
+
+        # Step 2: Start HTTP server in a separate thread (for Render)
+        http_thread = threading.Thread(target=run_http_server, daemon=True)
+        http_thread.start()
+        logger.info("🌐 HTTP server thread started for Render health checks")
 
         # Step 3: Connect to MongoDB database
         await db.connect()
