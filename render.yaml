@@ -3,6 +3,6 @@ services:
     name: Elevenyts
     runtime: python
     buildCommand: pip install -U -r requirements.txt
-    startCommand: python -m Elevenyts
+    startCommand: bash -c "python web.py & exec python -m Elevenyts"
     healthCheckPath: /health
     plan: free
