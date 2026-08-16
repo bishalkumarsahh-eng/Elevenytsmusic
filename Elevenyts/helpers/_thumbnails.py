@@ -360,18 +360,29 @@ def _render(art: Image.Image, title: str, artist: str,
 # ════════════════════════════════════════════════════════════════════════════
 
 class Thumbnail:
+    _session = None
+
+    @classmethod
+    async def _get_session(cls):
+        if cls._session is None or cls._session.closed:
+            timeout = aiohttp.ClientTimeout(total=15, connect=5, sock_read=10)
+            cls._session = aiohttp.ClientSession(timeout=timeout)
+        return cls._session
 
     async def save_thumb(self, output_path: str, url: str) -> str:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                with open(output_path, "wb") as f:
-                    f.write(await resp.read())
+        session = await self._get_session()
+        async with session.get(url) as resp:
+            resp.raise_for_status()
+            data = await resp.read()
+        with open(output_path, "wb") as f:
+            f.write(data)
         return output_path
 
     async def generate(self, song: Track, size=(1280, 720)) -> str:
         try:
             os.makedirs("cache", exist_ok=True)
-            output = f"cache/{song.id}_ultra.png"
+            output = f"cache/{song.id}_ultra.jpg"
+            legacy = f"cache/{song.id}_ultra.png"
 
             if os.path.exists(output):
                 return output
@@ -410,7 +421,7 @@ class Thumbnail:
                 )
             )
 
-            canvas.convert("RGB").save(output, "PNG", optimize=True)
+            canvas.convert("RGB").save(output, "JPEG", quality=88, optimize=False, progressive=True)
             return output
 
         except Exception:
