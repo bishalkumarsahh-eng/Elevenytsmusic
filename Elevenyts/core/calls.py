@@ -1,3 +1,4 @@
+# --- Stable VC playback: reduce short audio underruns/stutters ---
 # ==========================================================
 # Copyright (c) 2026 VelocityBots 
 # All Rights Reserved.
