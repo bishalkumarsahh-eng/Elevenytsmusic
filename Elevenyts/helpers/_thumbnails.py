@@ -241,119 +241,196 @@ def _render(art: Image.Image, title: str, artist: str,
             duration: str, is_live: bool = False,
             is_playing: bool = True,
             source_label: str = "PLAYING FROM ALBUM") -> Image.Image:
+    """Render a compact sunset music-player thumbnail.
 
-    art_sq = art.resize((ART_SIZE, ART_SIZE), Image.LANCZOS)
-    canvas = _make_bg(art)
+    The layout is intentionally different from the old glass-card design:
+    full-bleed sunset background, brush-cut artwork on the left and a clean
+    player console on the right.  It is kept at 1280x720 for Telegram previews.
+    """
+    import math
 
-    # main glass card
-    _glass_rect(canvas, CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
-                r=CARD_R, blur=15, tint_alpha=14, border_alpha=100,
-                shine_alpha=90, inner_alpha=35, border_w=2)
+    # --- warm sunset background (generated locally; no network work) ---
+    bg = Image.new("RGBA", (W, H), (0, 0, 0, 255))
+    px = bg.load()
+    stops = [
+        (0.00, (42, 24, 70)),
+        (0.22, (113, 54, 87)),
+        (0.48, (218, 96, 63)),
+        (0.70, (246, 154, 67)),
+        (1.00, (55, 48, 86)),
+    ]
+    for y in range(H):
+        t = y / max(1, H - 1)
+        for i in range(len(stops) - 1):
+            if stops[i][0] <= t <= stops[i + 1][0]:
+                a, ca = stops[i]
+                b, cb = stops[i + 1]
+                u = (t - a) / max(0.0001, b - a)
+                c = tuple(int(ca[k] * (1-u) + cb[k] * u) for k in range(3))
+                break
+        for x in range(W):
+            glow = max(0.0, 1.0 - abs(x - 780) / 850) * max(0.0, 1.0 - abs(t - .64) / .34)
+            px[x, y] = (
+                min(255, int(c[0] + 35 * glow)),
+                min(255, int(c[1] + 22 * glow)),
+                min(255, int(c[2] + 8 * glow)),
+                255,
+            )
 
-    # album art — clean, no scrim
-    mask_art = _rounded_mask((ART_SIZE, ART_SIZE), ART_R)
-    canvas.paste(art_sq.convert("RGBA"), (ART_X, ART_Y), mask_art)
+    d = ImageDraw.Draw(bg, "RGBA")
+    # Soft clouds.
+    for cx, cy, rx, ry, alpha in [
+        (160, 390, 250, 75, 35), (520, 430, 330, 90, 28),
+        (900, 355, 300, 70, 30), (1120, 455, 260, 85, 28),
+    ]:
+        d.ellipse([cx-rx, cy-ry, cx+rx, cy+ry], fill=(255, 205, 185, alpha))
+    # Sun.
+    for r in range(105, 10, -5):
+        alpha = int(5 + 28 * (1 - r / 105))
+        d.ellipse([790-r, 500-r, 790+r, 500+r], fill=(255, 211, 120, alpha))
+    d.ellipse([760, 470, 820, 530], fill=(255, 222, 135, 210))
+    # Layered mountain silhouettes.
+    d.polygon([(0,620),(160,535),(285,590),(430,505),(575,605),(760,520),(930,610),(1100,505),(1280,575),(1280,720),(0,720)],
+              fill=(38, 31, 55, 210))
+    d.polygon([(0,665),(210,575),(370,640),(560,565),(730,650),(930,565),(1090,640),(1280,555),(1280,720),(0,720)],
+              fill=(24, 25, 45, 235))
+
+    # Add a very soft colour wash from the real artwork, without making a
+    # second network request or doing expensive blur operations.
+    try:
+        wash = art.convert("RGB").resize((96, 96), Image.LANCZOS).filter(ImageFilter.GaussianBlur(18))
+        wash = wash.resize((W, H), Image.LANCZOS).convert("RGBA")
+        bg = Image.blend(bg, wash, alpha=0.10)
+    except Exception:
+        pass
+
+    canvas = bg.convert("RGBA")
+
+    # Outer player frame.
     d = ImageDraw.Draw(canvas, "RGBA")
-    d.rounded_rectangle([ART_X-2, ART_Y-2, ART_X+ART_SIZE+2, ART_Y+ART_SIZE+2],
-                        radius=ART_R+2, outline=(255,255,255,80), width=2)
-    d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
-                        radius=ART_R+1, outline=(255,255,255,30), width=1)
+    d.rounded_rectangle([10, 10, W-10, H-10], radius=30,
+                        fill=(10, 10, 22, 22), outline=(255, 128, 38, 220), width=3)
+    d.rounded_rectangle([16, 16, W-16, H-16], radius=26,
+                        outline=(255, 215, 170, 55), width=1)
 
-    # right panel
-    d  = ImageDraw.Draw(canvas, "RGBA")
-    iy = CARD_Y + 48
+    # --- brush-cut artwork on the left ---
+    art_box = (55, 82, 625, 625)
+    aw, ah = art_box[2]-art_box[0], art_box[3]-art_box[1]
+    art_img = art.convert("RGBA").resize((aw, ah), Image.LANCZOS)
+    mask = Image.new("L", (aw, ah), 0)
+    md = ImageDraw.Draw(mask)
+    md.rounded_rectangle([28, 28, aw-28, ah-28], radius=28, fill=245)
+    # Brush streaks around the portrait.
+    rng = __import__('random').Random(hash(title) & 0xffffffff)
+    for i in range(34):
+        y = rng.randint(20, ah-20)
+        x0 = rng.randint(0, 70)
+        x1 = rng.randint(aw-100, aw+10)
+        thick = rng.randint(4, 16)
+        md.rectangle([x0, y, x1, y+thick], fill=rng.randint(135, 220))
+    # Cut a few irregular transparent gaps.
+    for i in range(18):
+        y = rng.randint(0, ah)
+        x = rng.choice([rng.randint(0, 80), rng.randint(aw-80, aw)])
+        md.line([(x, y), (max(0, x-rng.randint(10,50)), min(ah, y+rng.randint(4,18)))], fill=0, width=rng.randint(2,7))
+    canvas.paste(art_img, (art_box[0], art_box[1]), mask)
 
-    # source label
-    _eq(d, INFO_X, iy+3, GREEN)
-    label = "🔴  LIVE" if is_live else source_label
-    d.text((INFO_X+38, iy), label, font=_font(13), fill=(*LGRAY, 210))
-    iy += 38
-
-    # song title — up to 3 lines so full name always shows
-    f_ttl  = _font(42, bold=True)
-    max_ch = max(1, int(INFO_W / 22))
-    lines  = textwrap.wrap(title, width=max_ch)[:3]
-    for ln in lines:
-        d.text((INFO_X, iy), ln, font=f_ttl, fill=WHITE)
-        bb = d.textbbox((INFO_X, iy), ln, font=f_ttl)
-        iy += bb[3] - bb[1] + 4
-    iy += 6
-
-    # artist name
-    f_art = _font(22)
-    d.text((INFO_X, iy), artist, font=f_art, fill=LGRAY)
-
-    # heart + more pills
-    rx = CARD_X + CARD_W - 36
-    ry = CARD_Y + 48
-    _glass_pill(canvas, rx-64, ry, 52, 38, r=19, tint_alpha=20, border_alpha=85, shine_alpha=60)
     d = ImageDraw.Draw(canvas, "RGBA")
-    _heart(d, rx-64, ry, GREEN)
-    _glass_pill(canvas, rx-4, ry, 52, 38, r=19, tint_alpha=20, border_alpha=85, shine_alpha=60)
-    d = ImageDraw.Draw(canvas, "RGBA")
-    d.text((rx-22, ry-10), "···", font=_font(22, bold=True), fill=LGRAY)
+    # Thin warm glow around artwork.
+    d.rounded_rectangle([art_box[0]+25, art_box[1]+25, art_box[2]-25, art_box[3]-25],
+                        radius=28, outline=(255, 145, 65, 85), width=2)
 
-    iy += 50
+    # Small brand badge.
+    d.rounded_rectangle([30, 28, 145, 92], radius=18, fill=(255, 93, 0, 215))
+    d.text((62, 35), "V", font=_font(38, bold=True), fill=WHITE)
 
-    # progress bar
-    bar_y = iy + 18
-    d = ImageDraw.Draw(canvas, "RGBA")
-    _bar(d, INFO_X, bar_y, INFO_W, 5, 0.40,
-         track=(255,255,255,40), fill=GREEN, dot=WHITE, dot_r=8)
+    # Right player area.
+    x = 665
+    right = 1220
+    width = right - x
+    top = 105
 
-    iy = bar_y + 34
-    f_t = _font(16)
-    d.text((INFO_X, iy), "0:00", font=f_t, fill=LGRAY)
-    dur_str = "🔴 LIVE" if is_live else _fmt(duration)
-    tw = d.textbbox((0,0), dur_str, font=f_t)
-    d.text((INFO_X+INFO_W-(tw[2]-tw[0]), iy), dur_str,
-           font=f_t, fill=(255,80,80) if is_live else LGRAY)
+    # Top label and status.
+    _eq(d, x, top+7, (255, 111, 24, 235), h=(8,15,10,19,13))
+    d.text((x+38, top), source_label, font=_font(18, bold=True), fill=(255, 232, 214, 235))
+    d.text((right-95, top-3), "♥", font=_font(35, bold=True), fill=(255, 104, 22, 235))
+    d.text((right-38, top+2), "···", font=_font(22, bold=True), fill=(35, 24, 30, 235))
 
-    iy += 52
+    # Song title, safely wrapped by actual pixel width.
+    clean_title = re.sub(r"\s+", " ", title).strip() or "Now Playing"
+    f_title = _font(39, bold=True)
+    words = clean_title.split()
+    lines, line = [], ""
+    for word in words:
+        candidate = f"{line} {word}".strip()
+        if d.textbbox((0,0), candidate, font=f_title)[2] <= width:
+            line = candidate
+        else:
+            if line:
+                lines.append(line)
+            line = word
+        if len(lines) == 3:
+            break
+    if line and len(lines) < 3:
+        lines.append(line)
+    ty = top + 48
+    for ln in lines[:3]:
+        d.text((x, ty), ln, font=f_title, fill=(20, 14, 25, 250))
+        ty += 45
 
-    # transport controls
-    ctrl_y = iy + 6
-    mid    = INFO_X + INFO_W // 2
-    sp     = 88
-    d = ImageDraw.Draw(canvas, "RGBA")
-    _shuffle(d, mid - sp*2, ctrl_y, LGRAY)
-    d.ellipse([mid-sp*2-4, ctrl_y+28, mid-sp*2+4, ctrl_y+36], fill=GREEN)
-    _prev_icon(d, mid - sp, ctrl_y, WHITE)
+    # Artist/source subline.
+    if artist:
+        artist_clean = re.sub(r"\s+", " ", artist).strip()
+        d.text((x, ty+2), artist_clean[:42], font=_font(17), fill=(45, 30, 42, 205))
+        ty += 31
 
-    _glass_pill(canvas, mid, ctrl_y, 96, 96, r=48,
-                tint_alpha=210, border_alpha=200, shine_alpha=130)
-    d = ImageDraw.Draw(canvas, "RGBA")
-    (_pause if is_playing else _play)(d, mid, ctrl_y, (12,12,22))
+    # Equalizer waveform.
+    wave_y = 345
+    wave_w = width
+    bars = 62
+    step = wave_w / bars
+    seed = sum(ord(c) for c in clean_title) % 997
+    for i in range(bars):
+        v = (math.sin(i*1.73 + seed) + math.sin(i*.47 + seed*.31) + 2) / 4
+        h = 9 + int(v * 45)
+        bx = int(x + i * step)
+        d.rounded_rectangle([bx, wave_y-h, bx+max(2, int(step*.48)), wave_y],
+                            radius=2, fill=(237, 91, 18, 205))
 
-    _next_icon(d, mid + sp, ctrl_y, WHITE)
-    _repeat(d, mid + sp*2, ctrl_y, LGRAY)
-    d.ellipse([mid+sp*2-4, ctrl_y+28, mid+sp*2+4, ctrl_y+36], fill=GREEN)
+    # Progress bar + times.
+    bar_y = 374
+    _bar(d, x, bar_y, width, 7, 0.40,
+         track=(70, 38, 48, 110), fill=(247, 91, 19, 235), dot=(255,255,255), dot_r=8)
+    f_time = _font(15, bold=True)
+    d.text((x, bar_y+19), "0:00", font=f_time, fill=(55, 37, 44, 220))
+    dur_str = "LIVE" if is_live else _fmt(duration)
+    tw = d.textbbox((0,0), dur_str, font=f_time)[2]
+    d.text((right-tw, bar_y+19), dur_str, font=f_time, fill=(55, 37, 44, 220))
 
-    # volume strip
-    bot_y = CARD_Y + CARD_H - 60
-    _glass_rect(canvas, INFO_X-12, bot_y, CARD_X+CARD_W-12, bot_y+46,
-                r=23, blur=18, tint_alpha=12, border_alpha=80,
-                shine_alpha=55, inner_alpha=22, border_w=1)
-    d = ImageDraw.Draw(canvas, "RGBA")
-    vx, vy = INFO_X+4, bot_y+23
-    _volume(d, vx, vy, LGRAY)
-    _bar(d, vx+30, vy-3, INFO_W-108, 4, 0.52,
-         track=(255,255,255,38), fill=TEAL, dot=WHITE, dot_r=7)
-    ri = CARD_X + CARD_W - 22
-    for sym in ["⊞", "⊡", "⤢"]:
-        d.text((ri-24, bot_y+14), sym, font=_font(18), fill=LGRAY)
-        ri -= 40
+    # Main transport row.
+    cy = 500
+    positions = [x+45, x+160, x+width//2, right-160, right-45]
+    _shuffle(d, positions[0], cy, (47, 31, 38, 230))
+    _prev_icon(d, positions[1], cy, (35, 26, 32, 245))
+    # Orange play/pause disc.
+    d.ellipse([positions[2]-48, cy-48, positions[2]+48, cy+48], fill=(180, 57, 8, 220), outline=(255, 159, 70, 245), width=3)
+    d.ellipse([positions[2]-37, cy-37, positions[2]+37, cy+37], outline=(255, 204, 142, 100), width=2)
+    (_pause if is_playing else _play)(d, positions[2], cy, WHITE)
+    _next_icon(d, positions[3], cy, (35, 26, 32, 245))
+    _repeat(d, positions[4], cy, (47, 31, 38, 230))
 
-    # VelocityBots pill
-    _glass_pill(canvas, W-140, 30, 130, 32, r=16,
-                tint_alpha=16, border_alpha=80, shine_alpha=55)
-    d = ImageDraw.Draw(canvas, "RGBA")
-    d.text((W-188, 14), "VelocityBots", font=_font(21, bold=True), fill=WHITE)
-    d.text((W-60,  18), "🔔",           font=_font(18),            fill=LGRAY)
-    d.text((W-28,  18), "···",          font=_font(18, bold=True), fill=LGRAY)
+    # Volume strip.
+    vy = 620
+    _volume(d, x+12, vy, (45, 32, 40, 220))
+    _bar(d, x+48, vy-4, width-90, 7, 0.52,
+         track=(60, 35, 45, 100), fill=(243, 100, 24, 225), dot=(255,245,225), dot_r=7)
+    _eq(d, right-42, vy-9, (236, 91, 19, 220), h=(9,18,13,23,15))
+
+    # Small footer branding.
+    d.text((55, 655), "VELOCITY MUSIC", font=_font(16, bold=True), fill=(255, 224, 205, 220))
+    d.text((right-160, 655), "LIVE TO PLAY", font=_font(14, bold=True), fill=(255, 224, 205, 205))
 
     return canvas
-
 
 # ════════════════════════════════════════════════════════════════════════════
 # THUMBNAIL CLASS
@@ -381,8 +458,8 @@ class Thumbnail:
     async def generate(self, song: Track, size=(1280, 720)) -> str:
         try:
             os.makedirs("cache", exist_ok=True)
-            output = f"cache/{song.id}_ultra.jpg"
-            legacy = f"cache/{song.id}_ultra.png"
+            output = f"cache/{song.id}_sunset.jpg"
+            legacy = f"cache/{song.id}_sunset.png"
 
             if os.path.exists(output):
                 return output
