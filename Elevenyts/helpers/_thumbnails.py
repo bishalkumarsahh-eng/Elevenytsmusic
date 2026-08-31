@@ -367,8 +367,17 @@ def _render(art: Image.Image, title: str, artist: str,
 
     # Compact transport row.
     ctrl_y = 430
-    positions = [info_x+36, info_x+145, info_x+info_w//2-72,
-                 info_x+info_w-145, info_x+info_w-36]
+    # Keep the transport controls balanced around the true center:
+    # BACK  <  PLAY/PAUSE  >  FORWARD
+    # Shuffle and repeat remain at the outer edges.
+    center_x = info_x + info_w // 2
+    positions = [
+        info_x + 36,
+        center_x - 132,
+        center_x,
+        center_x + 132,
+        info_x + info_w - 36,
+    ]
     _shuffle(d, positions[0], ctrl_y, (110,115,130,150))
     _prev_icon(d, positions[1], ctrl_y, (220,222,230,220))
 
