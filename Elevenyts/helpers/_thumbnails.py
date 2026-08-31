@@ -241,196 +241,159 @@ def _render(art: Image.Image, title: str, artist: str,
             duration: str, is_live: bool = False,
             is_playing: bool = True,
             source_label: str = "PLAYING FROM ALBUM") -> Image.Image:
-    """Render a compact sunset music-player thumbnail.
+    """Render the compact dark/orange music-player thumbnail.
 
-    The layout is intentionally different from the old glass-card design:
-    full-bleed sunset background, brush-cut artwork on the left and a clean
-    player console on the right.  It is kept at 1280x720 for Telegram previews.
+    Layout is intentionally based on a compact Telegram music-card:
+    full-bleed dark artwork backdrop, rounded dark card, large artwork
+    on the left, compact metadata/player controls on the right.
     """
-    import math
-
-    # --- warm sunset background (generated locally; no network work) ---
-    bg = Image.new("RGBA", (W, H), (0, 0, 0, 255))
-    px = bg.load()
-    stops = [
-        (0.00, (42, 24, 70)),
-        (0.22, (113, 54, 87)),
-        (0.48, (218, 96, 63)),
-        (0.70, (246, 154, 67)),
-        (1.00, (55, 48, 86)),
-    ]
-    for y in range(H):
-        t = y / max(1, H - 1)
-        for i in range(len(stops) - 1):
-            if stops[i][0] <= t <= stops[i + 1][0]:
-                a, ca = stops[i]
-                b, cb = stops[i + 1]
-                u = (t - a) / max(0.0001, b - a)
-                c = tuple(int(ca[k] * (1-u) + cb[k] * u) for k in range(3))
-                break
-        for x in range(W):
-            glow = max(0.0, 1.0 - abs(x - 780) / 850) * max(0.0, 1.0 - abs(t - .64) / .34)
-            px[x, y] = (
-                min(255, int(c[0] + 35 * glow)),
-                min(255, int(c[1] + 22 * glow)),
-                min(255, int(c[2] + 8 * glow)),
-                255,
-            )
-
-    d = ImageDraw.Draw(bg, "RGBA")
-    # Soft clouds.
-    for cx, cy, rx, ry, alpha in [
-        (160, 390, 250, 75, 35), (520, 430, 330, 90, 28),
-        (900, 355, 300, 70, 30), (1120, 455, 260, 85, 28),
-    ]:
-        d.ellipse([cx-rx, cy-ry, cx+rx, cy+ry], fill=(255, 205, 185, alpha))
-    # Sun.
-    for r in range(105, 10, -5):
-        alpha = int(5 + 28 * (1 - r / 105))
-        d.ellipse([790-r, 500-r, 790+r, 500+r], fill=(255, 211, 120, alpha))
-    d.ellipse([760, 470, 820, 530], fill=(255, 222, 135, 210))
-    # Layered mountain silhouettes.
-    d.polygon([(0,620),(160,535),(285,590),(430,505),(575,605),(760,520),(930,610),(1100,505),(1280,575),(1280,720),(0,720)],
-              fill=(38, 31, 55, 210))
-    d.polygon([(0,665),(210,575),(370,640),(560,565),(730,650),(930,565),(1090,640),(1280,555),(1280,720),(0,720)],
-              fill=(24, 25, 45, 235))
-
-    # Add a very soft colour wash from the real artwork, without making a
-    # second network request or doing expensive blur operations.
-    try:
-        wash = art.convert("RGB").resize((96, 96), Image.LANCZOS).filter(ImageFilter.GaussianBlur(18))
-        wash = wash.resize((W, H), Image.LANCZOS).convert("RGBA")
-        bg = Image.blend(bg, wash, alpha=0.10)
-    except Exception:
-        pass
-
+    # Full-bleed artwork backdrop, heavily darkened so the UI stays readable.
+    aw, ah = art.size
+    scale = max(W / max(1, aw), H / max(1, ah))
+    bg = art.convert("RGB").resize((int(aw * scale), int(ah * scale)), Image.LANCZOS)
+    ox = max(0, (bg.width - W) // 2)
+    oy = max(0, (bg.height - H) // 2)
+    bg = bg.crop((ox, oy, ox + W, oy + H)).filter(ImageFilter.GaussianBlur(5))
     canvas = bg.convert("RGBA")
 
-    # Outer player frame.
+    # Dark cinematic wash; this keeps the card compact and legible over any artwork.
+    wash = Image.new("RGBA", (W, H), (2, 4, 10, 190))
+    canvas = Image.alpha_composite(canvas, wash)
+
+    # Main card — almost full canvas, thin orange outline like the reference.
+    x0, y0 = 28, 24
+    x1, y1 = W - 28, H - 24
     d = ImageDraw.Draw(canvas, "RGBA")
-    d.rounded_rectangle([10, 10, W-10, H-10], radius=30,
-                        fill=(10, 10, 22, 22), outline=(255, 128, 38, 220), width=3)
-    d.rounded_rectangle([16, 16, W-16, H-16], radius=26,
-                        outline=(255, 215, 170, 55), width=1)
+    d.rounded_rectangle([x0, y0, x1, y1], radius=30, fill=(5, 7, 15, 235), outline=(255, 120, 35, 230), width=2)
+    d.rounded_rectangle([x0+5, y0+5, x1-5, y1-5], radius=25, outline=(255, 255, 255, 32), width=1)
 
-    # --- brush-cut artwork on the left ---
-    art_box = (55, 82, 625, 625)
-    aw, ah = art_box[2]-art_box[0], art_box[3]-art_box[1]
-    art_img = art.convert("RGBA").resize((aw, ah), Image.LANCZOS)
-    mask = Image.new("L", (aw, ah), 0)
-    md = ImageDraw.Draw(mask)
-    md.rounded_rectangle([28, 28, aw-28, ah-28], radius=28, fill=245)
-    # Brush streaks around the portrait.
-    rng = __import__('random').Random(hash(title) & 0xffffffff)
-    for i in range(34):
-        y = rng.randint(20, ah-20)
-        x0 = rng.randint(0, 70)
-        x1 = rng.randint(aw-100, aw+10)
-        thick = rng.randint(4, 16)
-        md.rectangle([x0, y, x1, y+thick], fill=rng.randint(135, 220))
-    # Cut a few irregular transparent gaps.
-    for i in range(18):
-        y = rng.randint(0, ah)
-        x = rng.choice([rng.randint(0, 80), rng.randint(aw-80, aw)])
-        md.line([(x, y), (max(0, x-rng.randint(10,50)), min(ah, y+rng.randint(4,18)))], fill=0, width=rng.randint(2,7))
-    canvas.paste(art_img, (art_box[0], art_box[1]), mask)
+    # Subtle orange glow around the frame.
+    glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow, "RGBA")
+    for n in range(14, 0, -2):
+        a = int(18 * (1 - n / 16))
+        gd.rounded_rectangle([x0-n, y0-n, x1+n, y1+n], radius=30+n, outline=(255, 105, 25, a), width=2)
+    canvas = Image.alpha_composite(canvas, glow)
+    d = ImageDraw.Draw(canvas, "RGBA")
+
+    # Geometry: artwork occupies the left ~45%; information remains compact on right.
+    art_x, art_y = 70, 106
+    art_w, art_h = 520, 492
+    info_x = 635
+    info_w = 535
+
+    # Artwork: rounded image with a clean dark/orange frame.
+    art_scaled = art.convert("RGB")
+    scale = max(art_w / max(1, art_scaled.width), art_h / max(1, art_scaled.height))
+    art_scaled = art_scaled.resize((int(art_scaled.width * scale), int(art_scaled.height * scale)), Image.LANCZOS)
+    ax = max(0, (art_scaled.width - art_w) // 2)
+    ay = max(0, (art_scaled.height - art_h) // 2)
+    art_scaled = art_scaled.crop((ax, ay, ax + art_w, ay + art_h)).convert("RGBA")
+    mask = _rounded_mask((art_w, art_h), 22)
+    canvas.paste(art_scaled, (art_x, art_y), mask)
 
     d = ImageDraw.Draw(canvas, "RGBA")
-    # Thin warm glow around artwork.
-    d.rounded_rectangle([art_box[0]+25, art_box[1]+25, art_box[2]-25, art_box[3]-25],
-                        radius=28, outline=(255, 145, 65, 85), width=2)
+    d.rounded_rectangle([art_x, art_y, art_x+art_w, art_y+art_h], radius=22, outline=(255, 125, 45, 170), width=2)
+    d.rounded_rectangle([art_x+4, art_y+4, art_x+art_w-4, art_y+art_h-4], radius=18, outline=(255,255,255,55), width=1)
 
-    # Small brand badge.
-    d.rounded_rectangle([30, 28, 145, 92], radius=18, fill=(255, 93, 0, 215))
-    d.text((62, 35), "V", font=_font(38, bold=True), fill=WHITE)
+    # Creative diagonal matte over the far-right edge of the artwork.
+    # It gives the thumbnail a distinctive cut-card look without covering the subject.
+    matte = Image.new("RGBA", (art_w, art_h), (0, 0, 0, 0))
+    md = ImageDraw.Draw(matte, "RGBA")
+    md.polygon([
+        (art_w-105, 0), (art_w, 0), (art_w, art_h),
+        (art_w-205, art_h), (art_w-72, int(art_h*0.55))
+    ], fill=(3, 5, 12, 205))
+    canvas.alpha_composite(matte, (art_x, art_y))
+    d = ImageDraw.Draw(canvas, "RGBA")
 
-    # Right player area.
-    x = 665
-    right = 1220
-    width = right - x
-    top = 105
+    # Tiny top-left status badge.
+    d.rounded_rectangle([45, 42, 126, 90], radius=12, fill=(255, 104, 18, 235))
+    d.text((66, 48), "V", font=_font(28, bold=True), fill=WHITE)
 
-    # Top label and status.
-    _eq(d, x, top+7, (255, 111, 24, 235), h=(8,15,10,19,13))
-    d.text((x+38, top), source_label, font=_font(18, bold=True), fill=(255, 232, 214, 235))
-    d.text((right-95, top-3), "♥", font=_font(35, bold=True), fill=(255, 104, 22, 235))
-    d.text((right-38, top+2), "···", font=_font(22, bold=True), fill=(35, 24, 30, 235))
+    # Tiny brand mark in the bottom-left.
+    d.text((70, 638), "VELOCITY MUSIC", font=_font(13, bold=True), fill=(210, 215, 225, 210))
+    d.text((W-185, 638), "LIVE TO PLAY", font=_font(13, bold=True), fill=(210, 215, 225, 210))
 
-    # Song title, safely wrapped by actual pixel width.
-    clean_title = re.sub(r"\s+", " ", title).strip() or "Now Playing"
-    f_title = _font(39, bold=True)
-    words = clean_title.split()
-    lines, line = [], ""
-    for word in words:
-        candidate = f"{line} {word}".strip()
-        if d.textbbox((0,0), candidate, font=f_title)[2] <= width:
-            line = candidate
-        else:
-            if line:
-                lines.append(line)
-            line = word
-        if len(lines) == 3:
-            break
-    if line and len(lines) < 3:
-        lines.append(line)
-    ty = top + 48
-    for ln in lines[:3]:
-        d.text((x, ty), ln, font=f_title, fill=(20, 14, 25, 250))
-        ty += 45
+    # Header on the right.
+    header_y = 96
+    _eq(d, info_x, header_y+6, (255, 112, 24, 255), h=(7,12,17,10,14))
+    d.text((info_x+34, header_y), source_label if not is_live else "LIVE",
+           font=_font(16, bold=True), fill=(225, 225, 232, 225))
 
-    # Artist/source subline.
+    # Favorite / more controls.
+    _heart(d, W-92, header_y+6, (255, 101, 20, 255))
+    d.text((W-54, header_y-3), "···", font=_font(20, bold=True), fill=(210,215,225,210))
+
+    # Song title — deliberately compact, max 3 lines.
+    title = re.sub(r"\s+", " ", str(title or "Now Playing")).strip()
+    title_font = _font(35, bold=True)
+    lines = textwrap.wrap(title, width=27, break_long_words=False, break_on_hyphens=False)[:3]
+    ty = 145
+    for line in lines:
+        d.text((info_x, ty), line, font=title_font, fill=WHITE)
+        bb = d.textbbox((info_x, ty), line, font=title_font)
+        ty += (bb[3] - bb[1]) + 3
+
+    # Artist is small and unobtrusive; don't let it push controls down.
     if artist:
-        artist_clean = re.sub(r"\s+", " ", artist).strip()
-        d.text((x, ty+2), artist_clean[:42], font=_font(17), fill=(45, 30, 42, 205))
-        ty += 31
+        artist_clean = re.sub(r"\s+", " ", str(artist)).strip()
+        artist_font = _font(15)
+        d.text((info_x, min(ty+2, 265)), artist_clean[:52], font=artist_font, fill=(185,190,202,185))
 
-    # Equalizer waveform.
-    wave_y = 345
-    wave_w = width
-    bars = 62
-    step = wave_w / bars
-    seed = sum(ord(c) for c in clean_title) % 997
-    for i in range(bars):
-        v = (math.sin(i*1.73 + seed) + math.sin(i*.47 + seed*.31) + 2) / 4
-        h = 9 + int(v * 45)
-        bx = int(x + i * step)
-        d.rounded_rectangle([bx, wave_y-h, bx+max(2, int(step*.48)), wave_y],
-                            radius=2, fill=(237, 91, 18, 205))
+    # Waveform + timeline.
+    wave_y = 305
+    wave_x = info_x
+    wave_w = info_w
+    bars = (8, 15, 22, 11, 28, 17, 34, 20, 12, 25, 31, 18, 27, 14, 36,
+            20, 12, 29, 17, 23, 13, 30, 18, 25, 16, 34, 21, 12, 28, 19,
+            31, 14, 23, 18, 27, 12, 35, 20, 15, 29, 18, 25, 13, 32, 17,
+            24, 12, 30, 20, 14, 27, 18, 34, 15, 23, 11, 28, 19, 31, 16)
+    gap = 5
+    bw = max(3, (wave_w - (len(bars)-1)*gap) // len(bars))
+    for i, hh in enumerate(bars):
+        bx = wave_x + i*(bw+gap)
+        d.rounded_rectangle([bx, wave_y-hh, bx+bw, wave_y], radius=2, fill=(255, 104, 20, 235))
 
-    # Progress bar + times.
-    bar_y = 374
-    _bar(d, x, bar_y, width, 7, 0.40,
-         track=(70, 38, 48, 110), fill=(247, 91, 19, 235), dot=(255,255,255), dot_r=8)
-    f_time = _font(15, bold=True)
-    d.text((x, bar_y+19), "0:00", font=f_time, fill=(55, 37, 44, 220))
-    dur_str = "LIVE" if is_live else _fmt(duration)
-    tw = d.textbbox((0,0), dur_str, font=f_time)[2]
-    d.text((right-tw, bar_y+19), dur_str, font=f_time, fill=(55, 37, 44, 220))
+    bar_y = 335
+    _bar(d, info_x, bar_y, info_w, 6, 0.40,
+         track=(255,255,255,30), fill=(255,104,20,255), dot=WHITE, dot_r=8)
+    f_time = _font(13)
+    d.text((info_x, 350), "0:00", font=f_time, fill=(155,160,175,180))
+    end_text = "LIVE" if is_live else _fmt(duration)
+    tw = d.textbbox((0,0), end_text, font=f_time)
+    d.text((info_x+info_w-(tw[2]-tw[0]), 350), end_text, font=f_time,
+           fill=(155,160,175,180) if not is_live else (255,105,45,255))
 
-    # Main transport row.
-    cy = 500
-    positions = [x+45, x+160, x+width//2, right-160, right-45]
-    _shuffle(d, positions[0], cy, (47, 31, 38, 230))
-    _prev_icon(d, positions[1], cy, (35, 26, 32, 245))
-    # Orange play/pause disc.
-    d.ellipse([positions[2]-48, cy-48, positions[2]+48, cy+48], fill=(180, 57, 8, 220), outline=(255, 159, 70, 245), width=3)
-    d.ellipse([positions[2]-37, cy-37, positions[2]+37, cy+37], outline=(255, 204, 142, 100), width=2)
-    (_pause if is_playing else _play)(d, positions[2], cy, WHITE)
-    _next_icon(d, positions[3], cy, (35, 26, 32, 245))
-    _repeat(d, positions[4], cy, (47, 31, 38, 230))
+    # Compact transport row.
+    ctrl_y = 430
+    positions = [info_x+36, info_x+145, info_x+info_w//2-72,
+                 info_x+info_w-145, info_x+info_w-36]
+    _shuffle(d, positions[0], ctrl_y, (110,115,130,150))
+    _prev_icon(d, positions[1], ctrl_y, (220,222,230,220))
 
-    # Volume strip.
-    vy = 620
-    _volume(d, x+12, vy, (45, 32, 40, 220))
-    _bar(d, x+48, vy-4, width-90, 7, 0.52,
-         track=(60, 35, 45, 100), fill=(243, 100, 24, 225), dot=(255,245,225), dot_r=7)
-    _eq(d, right-42, vy-9, (236, 91, 19, 220), h=(9,18,13,23,15))
+    # Orange circular play/pause button.
+    cx = positions[2]
+    d.ellipse([cx-40, ctrl_y-40, cx+40, ctrl_y+40], fill=(255,105,20,235), outline=(255,178,90,230), width=2)
+    d.ellipse([cx-31, ctrl_y-31, cx+31, ctrl_y+31], fill=(125,45,12,185))
+    (_pause if is_playing else _play)(d, cx, ctrl_y, WHITE)
 
-    # Small footer branding.
-    d.text((55, 655), "VELOCITY MUSIC", font=_font(16, bold=True), fill=(255, 224, 205, 220))
-    d.text((right-160, 655), "LIVE TO PLAY", font=_font(14, bold=True), fill=(255, 224, 205, 205))
+    _next_icon(d, positions[3], ctrl_y, (220,222,230,220))
+    _repeat(d, positions[4], ctrl_y, (110,115,130,150))
+
+    # Volume strip at the bottom-right.
+    vol_y = 528
+    _volume(d, info_x+5, vol_y, (180,185,198,185))
+    _bar(d, info_x+40, vol_y-3, info_w-85, 5, 0.55,
+         track=(255,255,255,25), fill=(255,104,20,255), dot=WHITE, dot_r=7)
+    _eq(d, info_x+info_w-16, vol_y+7, (255,104,20,235), h=(7,14,20,11,17))
+
+    # Small bottom-right live indicator.
+    d.text((info_x, 566), "●", font=_font(11, bold=True), fill=(255,105,20,255))
+    d.text((info_x+17, 565), "NOW PLAYING", font=_font(12, bold=True), fill=(180,185,198,175))
 
     return canvas
+
 
 # ════════════════════════════════════════════════════════════════════════════
 # THUMBNAIL CLASS
@@ -458,8 +421,8 @@ class Thumbnail:
     async def generate(self, song: Track, size=(1280, 720)) -> str:
         try:
             os.makedirs("cache", exist_ok=True)
-            output = f"cache/{song.id}_sunset.jpg"
-            legacy = f"cache/{song.id}_sunset.png"
+            output = f"cache/{song.id}_darkcard.jpg"
+            legacy = f"cache/{song.id}_darkcard.png"
 
             if os.path.exists(output):
                 return output
