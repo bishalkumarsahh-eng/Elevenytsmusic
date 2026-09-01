@@ -240,203 +240,120 @@ def _placeholder() -> Image.Image:
 def _render(art: Image.Image, title: str, artist: str,
             duration: str, is_live: bool = False,
             is_playing: bool = True,
-            source_label: str = "NOW PLAYING") -> Image.Image:
-    """Fast editorial music thumbnail.
+            source_label: str = "PLAYING FROM ALBUM") -> Image.Image:
 
-    The artwork is treated as the main artist/track visual instead of a small
-    album card.  Everything is rendered locally with a small blurred preview
-    for the background, keeping generation considerably faster than the old
-    full-resolution effects.
-    """
-    from PIL import ImageOps
-    import math
+    art_sq = art.resize((ART_SIZE, ART_SIZE), Image.LANCZOS)
+    canvas = _make_bg(art)
 
-    # ── Fast background: tiny blurred artwork + dark overlay ────────────────
-    src = art.convert("RGB")
-    bg_small = ImageOps.fit(src, (96, 54), method=Image.Resampling.BILINEAR)
-    bg_small = bg_small.filter(ImageFilter.GaussianBlur(7))
-    bg = bg_small.resize((W, H), Image.Resampling.BILINEAR).convert("RGBA")
-    overlay = Image.new("RGBA", (W, H), (5, 6, 12, 205))
-    bg = Image.alpha_composite(bg, overlay)
+    # main glass card
+    _glass_rect(canvas, CARD_X, CARD_Y, CARD_X+CARD_W, CARD_Y+CARD_H,
+                r=CARD_R, blur=15, tint_alpha=14, border_alpha=100,
+                shine_alpha=90, inner_alpha=35, border_w=2)
 
-    # Subtle warm/orange wash used by the new editorial style.
-    wash = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    wd = ImageDraw.Draw(wash, "RGBA")
-    wd.ellipse([30, 35, 760, 760], fill=(255, 120, 20, 34))
-    wd.ellipse([650, -160, 1450, 620], fill=(255, 80, 20, 18))
-    bg = Image.alpha_composite(bg, wash)
-
-    canvas = bg
+    # album art — clean, no scrim
+    mask_art = _rounded_mask((ART_SIZE, ART_SIZE), ART_R)
+    canvas.paste(art_sq.convert("RGBA"), (ART_X, ART_Y), mask_art)
     d = ImageDraw.Draw(canvas, "RGBA")
+    d.rounded_rectangle([ART_X-2, ART_Y-2, ART_X+ART_SIZE+2, ART_Y+ART_SIZE+2],
+                        radius=ART_R+2, outline=(255,255,255,80), width=2)
+    d.rounded_rectangle([ART_X-1, ART_Y-1, ART_X+ART_SIZE+1, ART_Y+ART_SIZE+1],
+                        radius=ART_R+1, outline=(255,255,255,30), width=1)
 
-    # ── Outer editorial frame ───────────────────────────────────────────────
-    d.rounded_rectangle([14, 14, W-14, H-14], radius=30,
-                        fill=(5, 6, 12, 80), outline=(218, 143, 55, 210), width=2)
-    d.rounded_rectangle([21, 21, W-21, H-21], radius=26,
-                        outline=(255, 255, 255, 28), width=1)
+    # right panel
+    d  = ImageDraw.Draw(canvas, "RGBA")
+    iy = CARD_Y + 48
 
-    # ── Left: large artist/track photo ─────────────────────────────────────
-    # Deliberately large and edge-to-edge: this is the main visual identity.
-    ax0, ay0, ax1, ay1 = 38, 40, 700, 650
-    aw, ah = ax1-ax0, ay1-ay0
-    photo = ImageOps.fit(src, (aw, ah), method=Image.Resampling.LANCZOS,
-                         centering=(0.5, 0.48)).convert("RGBA")
+    # source label
+    _eq(d, INFO_X, iy+3, GREEN)
+    label = "🔴  LIVE" if is_live else source_label
+    d.text((INFO_X+38, iy), label, font=_font(13), fill=(*LGRAY, 210))
+    iy += 38
 
-    # Dark lower/side vignette so artist/title treatment remains readable.
-    vignette = Image.new("RGBA", (aw, ah), (0, 0, 0, 0))
-    vd = ImageDraw.Draw(vignette, "RGBA")
-    for i in range(12):
-        a = int(95 * (i + 1) / 12)
-        vd.rectangle([0, ah-i*7, aw, ah], fill=(0, 0, 0, a))
-    photo = Image.alpha_composite(photo, vignette)
+    # song title — up to 3 lines so full name always shows
+    f_ttl  = _font(42, bold=True)
+    max_ch = max(1, int(INFO_W / 22))
+    lines  = textwrap.wrap(title, width=max_ch)[:3]
+    for ln in lines:
+        d.text((INFO_X, iy), ln, font=f_ttl, fill=WHITE)
+        bb = d.textbbox((INFO_X, iy), ln, font=f_ttl)
+        iy += bb[3] - bb[1] + 4
+    iy += 6
 
-    # Rounded photo mask with an irregular/editorial edge impression.
-    pmask = _rounded_mask((aw, ah), 34)
-    canvas.paste(photo, (ax0, ay0), pmask)
+    # artist name
+    f_art = _font(22)
+    d.text((INFO_X, iy), artist, font=f_art, fill=LGRAY)
 
-    # Thin double border around photo.
+    # heart + more pills
+    rx = CARD_X + CARD_W - 36
+    ry = CARD_Y + 48
+    _glass_pill(canvas, rx-64, ry, 52, 38, r=19, tint_alpha=20, border_alpha=85, shine_alpha=60)
     d = ImageDraw.Draw(canvas, "RGBA")
-    d.rounded_rectangle([ax0, ay0, ax1, ay1], radius=34,
-                        outline=(255, 255, 255, 115), width=2)
-    d.rounded_rectangle([ax0+8, ay0+8, ax1-8, ay1-8], radius=28,
-                        outline=(255, 141, 35, 105), width=1)
+    _heart(d, rx-64, ry, GREEN)
+    _glass_pill(canvas, rx-4, ry, 52, 38, r=19, tint_alpha=20, border_alpha=85, shine_alpha=60)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    d.text((rx-22, ry-10), "···", font=_font(22, bold=True), fill=LGRAY)
 
-    # Large circular accent behind/over the artist image.
-    cx, cy = 330, 275
-    for r, a in [(205, 18), (190, 28), (176, 42)]:
-        d.ellipse([cx-r, cy-r, cx+r, cy+r], outline=(255, 150, 35, a), width=2)
-    d.arc([cx-190, cy-190, cx+190, cy+190], 215, 325,
-           fill=(255, 151, 38, 220), width=5)
+    iy += 50
 
-    # Editorial brush strokes behind the lower title.
-    d.polygon([(58, 535), (475, 515), (620, 540), (500, 582), (65, 574)],
-              fill=(10, 10, 14, 180))
-    d.line([(60, 588), (510, 570)], fill=(255, 128, 24, 210), width=4)
-    d.line([(92, 597), (430, 583)], fill=(255, 255, 255, 70), width=1)
+    # progress bar
+    bar_y = iy + 18
+    d = ImageDraw.Draw(canvas, "RGBA")
+    _bar(d, INFO_X, bar_y, INFO_W, 5, 0.40,
+         track=(255,255,255,40), fill=GREEN, dot=WHITE, dot_r=8)
 
-    # Brand mark.
-    d.rounded_rectangle([42, 30, 175, 84], radius=16,
-                        fill=(8, 8, 14, 210), outline=(255, 255, 255, 90), width=1)
-    d.text((66, 34), "V", font=_font(34, bold=True), fill=(255, 151, 38, 255))
-    d.text((108, 45), "VELOCITY", font=_font(13, bold=True), fill=WHITE)
+    iy = bar_y + 34
+    f_t = _font(16)
+    d.text((INFO_X, iy), "0:00", font=f_t, fill=LGRAY)
+    dur_str = "🔴 LIVE" if is_live else _fmt(duration)
+    tw = d.textbbox((0,0), dur_str, font=f_t)
+    d.text((INFO_X+INFO_W-(tw[2]-tw[0]), iy), dur_str,
+           font=f_t, fill=(255,80,80) if is_live else LGRAY)
 
-    # Photo labels.
-    d.rounded_rectangle([58, 605, 210, 640], radius=14,
-                        fill=(8, 8, 14, 210), outline=(255, 128, 25, 100), width=1)
-    d.text((76, 613), "ARTIST / NOW PLAYING", font=_font(12, bold=True),
-           fill=(255, 220, 185, 235))
+    iy += 52
 
-    # ── Right: clean editorial player console ───────────────────────────────
-    x, right = 760, 1228
-    width = right - x
-    top = 75
+    # transport controls
+    ctrl_y = iy + 6
+    mid    = INFO_X + INFO_W // 2
+    sp     = 88
+    d = ImageDraw.Draw(canvas, "RGBA")
+    _shuffle(d, mid - sp*2, ctrl_y, LGRAY)
+    d.ellipse([mid-sp*2-4, ctrl_y+28, mid-sp*2+4, ctrl_y+36], fill=GREEN)
+    _prev_icon(d, mid - sp, ctrl_y, WHITE)
 
-    # Header.
-    _eq(d, x, top+8, (255, 126, 28, 245), h=(8,16,11,20,13))
-    d.text((x+38, top), source_label, font=_font(17, bold=True),
-           fill=(255, 178, 80, 245))
-    d.text((right-58, top-7), "♡", font=_font(39, bold=True), fill=(255, 144, 36, 245))
+    _glass_pill(canvas, mid, ctrl_y, 96, 96, r=48,
+                tint_alpha=210, border_alpha=200, shine_alpha=130)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    (_pause if is_playing else _play)(d, mid, ctrl_y, (12,12,22))
 
-    # Title: large, white, maximum 3 lines.
-    clean_title = re.sub(r"\s+", " ", title).strip() or "Now Playing"
-    f_title = _font(38, bold=True)
-    words = clean_title.split()
-    lines, line = [], ""
-    for word in words:
-        candidate = f"{line} {word}".strip()
-        if d.textbbox((0, 0), candidate, font=f_title)[2] <= width:
-            line = candidate
-        else:
-            if line:
-                lines.append(line)
-            line = word
-        if len(lines) >= 2:
-            break
-    if line and len(lines) < 3:
-        lines.append(line)
-    ty = top + 58
-    for ln in lines[:3]:
-        d.text((x, ty), ln, font=f_title, fill=WHITE)
-        ty += 43
+    _next_icon(d, mid + sp, ctrl_y, WHITE)
+    _repeat(d, mid + sp*2, ctrl_y, LGRAY)
+    d.ellipse([mid+sp*2-4, ctrl_y+28, mid+sp*2+4, ctrl_y+36], fill=GREEN)
 
-    artist_clean = re.sub(r"\s+", " ", str(artist or "")).strip()
-    if artist_clean:
-        d.text((x, ty+4), artist_clean[:48], font=_font(17),
-               fill=(203, 190, 200, 220))
-        ty += 38
+    # volume strip
+    bot_y = CARD_Y + CARD_H - 60
+    _glass_rect(canvas, INFO_X-12, bot_y, CARD_X+CARD_W-12, bot_y+46,
+                r=23, blur=18, tint_alpha=12, border_alpha=80,
+                shine_alpha=55, inner_alpha=22, border_w=1)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    vx, vy = INFO_X+4, bot_y+23
+    _volume(d, vx, vy, LGRAY)
+    _bar(d, vx+30, vy-3, INFO_W-108, 4, 0.52,
+         track=(255,255,255,38), fill=TEAL, dot=WHITE, dot_r=7)
+    ri = CARD_X + CARD_W - 22
+    for sym in ["⊞", "⊡", "⤢"]:
+        d.text((ri-24, bot_y+14), sym, font=_font(18), fill=LGRAY)
+        ri -= 40
 
-    # Accent separator.
-    d.line([(x, ty+3), (x+95, ty+3)], fill=(255, 128, 26, 245), width=4)
-    d.line([(x+105, ty+3), (right, ty+3)], fill=(255, 255, 255, 35), width=2)
-
-    # Waveform.
-    wave_y = ty + 58
-    bars = 56
-    step = width / bars
-    seed = sum(ord(c) for c in clean_title) % 997
-    for i in range(bars):
-        v = (math.sin(i*1.71 + seed) + math.sin(i*.43 + seed*.17) + 2) / 4
-        h = 8 + int(v * 42)
-        bx = int(x + i * step)
-        fill = (255, 135, 30, 225) if i < bars*.62 else (172, 78, 35, 175)
-        d.rounded_rectangle([bx, wave_y-h, bx+max(2, int(step*.48)), wave_y],
-                            radius=2, fill=fill)
-
-    # Progress.
-    bar_y = wave_y + 28
-    _bar(d, x, bar_y, width, 6, 0.42,
-         track=(255, 255, 255, 32), fill=(255, 128, 25, 245),
-         dot=WHITE, dot_r=7)
-    f_time = _font(14, bold=True)
-    d.text((x, bar_y+15), "0:00", font=f_time, fill=(190, 185, 195, 210))
-    dur_str = "LIVE" if is_live else _fmt(duration)
-    tw = d.textbbox((0, 0), dur_str, font=f_time)[2]
-    d.text((right-tw, bar_y+15), dur_str, font=f_time, fill=(190, 185, 195, 210))
-
-    # Controls.
-    cy = 405
-    gap = width / 4
-    positions = [x+28, int(x+gap), int(x+width/2), int(x+width-gap), right-28]
-    _shuffle(d, positions[0], cy, (226, 216, 222, 215))
-    _prev_icon(d, positions[1], cy, WHITE)
-
-    # Distinctive central control.
-    d.ellipse([positions[2]-44, cy-44, positions[2]+44, cy+44],
-               fill=(255, 129, 26, 245), outline=(255, 208, 150, 235), width=3)
-    d.ellipse([positions[2]-52, cy-52, positions[2]+52, cy+52],
-               outline=(255, 142, 40, 75), width=2)
-    (_pause if is_playing else _play)(d, positions[2], cy, WHITE)
-    _next_icon(d, positions[3], cy, WHITE)
-    _repeat(d, positions[4], cy, (226, 216, 222, 215))
-
-    # Volume.
-    vy = 500
-    _volume(d, x+8, vy, (210, 204, 215, 205))
-    _bar(d, x+42, vy-4, width-78, 6, 0.56,
-         track=(255, 255, 255, 30), fill=(255, 128, 25, 220),
-         dot=(255, 255, 255), dot_r=6)
-
-    # Tiny status row.
-    d.text((x, 548), "HIGH QUALITY  •  MUSIC 24/7", font=_font(12, bold=True),
-           fill=(255, 177, 88, 215))
-    d.text((right-150, 548), "FAST • SECURE", font=_font(12, bold=True),
-           fill=(215, 205, 215, 185))
-
-    # ── Bottom feature rail ─────────────────────────────────────────────────
-    rail = (38, 665, 1242, 704)
-    d.rounded_rectangle(rail, radius=18, fill=(6, 7, 13, 220),
-                        outline=(255, 255, 255, 45), width=1)
-    items = [
-        (70, "ϟ", "HIGH QUALITY"),
-        (360, "↓", "FAST DOWNLOAD"),
-        (690, "◇", "100% SECURE"),
-        (1005, "➤", "ADD ME TO GROUP"),
-    ]
-    for px, icon, label in items:
-        d.text((px, 671), icon, font=_font(22, bold=True), fill=(255, 139, 34, 245))
-        d.text((px+30, 675), label, font=_font(12, bold=True), fill=WHITE)
+    # VelocityBots pill
+    _glass_pill(canvas, W-140, 30, 130, 32, r=16,
+                tint_alpha=16, border_alpha=80, shine_alpha=55)
+    d = ImageDraw.Draw(canvas, "RGBA")
+    d.text((W-188, 14), "VelocityBots", font=_font(21, bold=True), fill=WHITE)
+    d.text((W-60,  18), "🔔",           font=_font(18),            fill=LGRAY)
+    d.text((W-28,  18), "···",          font=_font(18, bold=True), fill=LGRAY)
 
     return canvas
+
 
 # ════════════════════════════════════════════════════════════════════════════
 # THUMBNAIL CLASS
@@ -464,8 +381,8 @@ class Thumbnail:
     async def generate(self, song: Track, size=(1280, 720)) -> str:
         try:
             os.makedirs("cache", exist_ok=True)
-            output = f"cache/{song.id}_editorial.jpg"
-            legacy = f"cache/{song.id}_editorial.png"
+            output = f"cache/{song.id}_ultra.jpg"
+            legacy = f"cache/{song.id}_ultra.png"
 
             if os.path.exists(output):
                 return output
