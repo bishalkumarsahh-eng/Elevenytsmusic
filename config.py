@@ -57,8 +57,8 @@ class Config:
         self.VIDEO_MAX_HEIGHT: int = self._parse_video_height()
 
         # ArtistBots API @ArtistApibot
-        self.ARTISTBOTS_API_URL: str = getenv("ARTISTBOTS_API_URL", "https://apiiiiii-d83edaacdabe.herokuapp.com")
-        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "jx_live_E-XjMNd28L59waHuP3UABGdN75Jvz3qWYcnDXBmxE2U1KKAS")
+        self.ARTISTBOTS_API_URL: str = getenv("ARTISTBOTS_API_URL", "https://api.artistbots.workers.dev")
+        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "Artistbots")
         self.ENABLE_API: bool = self._str_to_bool(getenv("ENABLE_API", "True"))
         self.ENABLE_COOKIES_FALLBACK: bool = self._str_to_bool(getenv("ENABLE_COOKIES_FALLBACK", "True"))
         self.API_TIMEOUT: int = int(getenv("API_TIMEOUT", "60"))
