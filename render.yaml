@@ -15,7 +15,7 @@
 # ==========================================================
 services:
   - type: worker
-    name: Elevenyts
+    name: VelocityBots
     runtime: python
     buildCommand: pip install -U -r requirements.txt
     startCommand: python -m Elevenyts

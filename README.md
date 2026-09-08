@@ -173,7 +173,7 @@ START_IMG= (Optional)
 | OWNER_ID | Owner Telegram ID |
 | SUPPORT_CHAT | Support Group Username |
 | SUPPORT_CHANNEL | Updates Channel Username |
-| ARTISTBOTS_API_URL |  Artistbots on Telegram |
+| ARTISTBOTS_API_URL |  VelocityBots ꭙ Music on Telegram |
 | ARTISTBOTS_KEY | t.me/artistapibot |
 
 ---
@@ -338,7 +338,7 @@ python -m Elevenyts
 
 ### 📢 Telegram Channel 💬 Support Group
 
-- **Telegram Channel**: [Artist bots](https://t.me/Artistbots)
+- **Telegram Channel**: [VelocityBots ꭙ Music](https://t.me/Artistbots)
 - **Support Group**: [Junox Music](https://t.me/junoxmusic)
 ---
 
@@ -364,7 +364,7 @@ python -m Elevenyts
 - PyTgCalls
 - MongoDB
 - Telegram API
-- ArtistBots
+- VelocityBots ꭙ Music
 
 ---
 
@@ -378,8 +378,8 @@ python -m Elevenyts
 
 ### Made with ❤️ by Artist
 
-### Powered by ArtistBots
+### Powered by VelocityBots ꭙ Music
 
-### © 2026 Elevenyts. All Rights Reserved.
+### © 2026 VelocityBots ꭙ Music. All Rights Reserved.
 
 </div>
