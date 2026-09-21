@@ -123,7 +123,6 @@ class YouTube:
             endpoint = "/download"
             api_endpoint = f"{self.api_url.rstrip('/')}{endpoint}"
             headers = {
-                "X-API-Key": self.artistbots_key,
                 "Accept": "audio/mpeg,video/mp4,application/octet-stream,*/*",
             }
 
@@ -132,7 +131,11 @@ class YouTube:
             ) as session:
                 async with session.get(
                     api_endpoint,
-                    params={"url": video_id, "type": "video" if video else "audio"},
+                    params={
+                        "url": video_id,
+                        "type": "video" if video else "audio",
+                        "api_key": self.artistbots_key,
+                    },
                     headers=headers,
                     timeout=aiohttp.ClientTimeout(total=self.api_stream_timeout),
                 ) as response:
