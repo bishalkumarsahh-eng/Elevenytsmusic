@@ -319,7 +319,7 @@ def queue_controls_html(chat_id: int, item_id: str) -> str:
         f'</tg-button-row>'
         f'<tg-button-row align="center">'
         f'<tg-button type="callback_data" style="danger" data="controls stop {chat_id}">ㅤㅤSᴛᴏᴘㅤㅤ</tg-button>'
-        f'<tg-button type="callback_data" style="primary" data="controls close {chat_id}">ㅤㅤPʟᴀʏ Nᴏᴡㅤㅤ</tg-button>'
+        f'<tg-button type="callback_data" style="primary" data="controls close {chat_id}">ㅤㅤCʟᴏsᴇㅤㅤ</tg-button>'
         f'</tg-button-row>'
     )
 
