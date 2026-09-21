@@ -44,7 +44,7 @@ class Config:
 
         # Support Links
         self.SUPPORT_CHANNEL: str = getenv("SUPPORT_CHANNEL", "https://t.me/junoxmusic_updates")
-        self.SUPPORT_CHAT: str = getenv("SUPPORT_CHAT", "https://t.me/Velocity_Bingo")
+        self.SUPPORT_CHAT: str = getenv("SUPPORT_CHAT", "https://t.me/junoxmusic")
 
         # Excluded Chats
         self.EXCLUDED_CHATS: List[int] = self._parse_excluded_chats()
@@ -57,8 +57,8 @@ class Config:
         self.VIDEO_MAX_HEIGHT: int = self._parse_video_height()
 
         # ArtistBots API @ArtistApibot
-        self.ARTISTBOTS_API_URL: str = getenv("ARTISTBOTS_API_URL", "https://api01.shrutibots.site")
-        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "ShrutiBotssBQcjTxL7DekUMb5RDr0")
+        self.ARTISTBOTS_API_URL: str = getenv("ARTISTBOTS_API_URL", "https://music-apii-76201ebccbfa.herokuapp.com")
+        self.ARTISTBOTS_KEY: str = getenv("ARTISTBOTS_KEY", "")
         self.ENABLE_API: bool = self._str_to_bool(getenv("ENABLE_API", "True"))
         self.ENABLE_COOKIES_FALLBACK: bool = self._str_to_bool(getenv("ENABLE_COOKIES_FALLBACK", "True"))
         self.API_TIMEOUT: int = int(getenv("API_TIMEOUT", "60"))
