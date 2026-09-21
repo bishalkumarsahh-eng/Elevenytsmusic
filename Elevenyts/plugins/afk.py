@@ -297,7 +297,6 @@ async def _send_text_message(chat_id: int, text: str, reply_to: int, parse_mode:
         chat_id=chat_id,
         text=text,
         parse_mode=parse_mode,
-        disable_web_page_preview=True,
         reply_to_message_id=reply_to,
     )
 
