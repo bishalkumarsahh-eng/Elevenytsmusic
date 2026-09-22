@@ -1,17 +1,30 @@
-# ==========================================================
-# Copyright (c) 2026 VelocityBots 
-# All Rights Reserved.
-#
-# Project      : VelocityBots API Telegram Music Bot
-# Powered By   : VelocityBots 
-# Type         : API Based Telegram Music Bot
-#
-# Bot          : @JunoXmusic_Robot
-# Channel      : https://t.me/junoxmusic_updates
-# GitHub       : https://github.com/bishalkumarsahh-eng
-#
-# Unauthorized copying, modification, or redistribution
-# of this source code without permission is prohibited.
-# ==========================================================
-import base64
-exec(base64.b64decode("ZnJvbSBFbGV2ZW55dHMgaW1wb3J0IGFwcApmcm9tIHB5cm9ncmFtIGltcG9ydCBDbGllbnQsIGZpbHRlcnMKCmZyb20gcHlyb2dyYW0uZW51bXMgaW1wb3J0IFBhcnNlTW9kZQoKIyMjIwoKQGFwcC5vbl9tZXNzYWdlKGZpbHRlcnMuY29tbWFuZCgnaWQnKSkKYXN5bmMgZGVmIGdldGlkKGNsaWVudCwgbWVzc2FnZSk6CiAgICBjaGF0ID0gbWVzc2FnZS5jaGF0CiAgICB5b3VyX2lkID0gbWVzc2FnZS5mcm9tX3VzZXIuaWQKICAgIG1lc3NhZ2VfaWQgPSBtZXNzYWdlLmlkCiAgICByZXBseSA9IG1lc3NhZ2UucmVwbHlfdG9fbWVzc2FnZQoKICAgIHRleHQgPSBmIioqW+G0jeG0h3Nz4bSAyaLhtIcgyarhtIU6XSh7bWVzc2FnZS5saW5rfSkqKiBge21lc3NhZ2VfaWR9YFxuIgogICAgdGV4dCArPSBmIioqW8qP4bSP4bScyoAgyarhtIU6XSh0ZzovL3VzZXI/aWQ9e3lvdXJfaWR9KSoqIGB7eW91cl9pZH1gXG4iCgogICAgaWYgbm90IG1lc3NhZ2UuY29tbWFuZDoKICAgICAgICBtZXNzYWdlLmNvbW1hbmQgPSBtZXNzYWdlLnRleHQuc3BsaXQoKQoKICAgIGlmIG5vdCBtZXNzYWdlLmNvbW1hbmQ6CiAgICAgICAgbWVzc2FnZS5jb21tYW5kID0gbWVzc2FnZS50ZXh0LnNwbGl0KCkKCiAgICBpZiBsZW4obWVzc2FnZS5jb21tYW5kKSA9PSAyOgogICAgICAgIHRyeToKICAgICAgICAgICAgc3BsaXQgPSBtZXNzYWdlLnRleHQuc3BsaXQoTm9uZSwgMSlbMV0uc3RyaXAoKQogICAgICAgICAgICB1c2VyX2lkID0gKGF3YWl0IGNsaWVudC5nZXRfdXNlcnMoc3BsaXQpKS5pZAogICAgICAgICAgICB0ZXh0ICs9IGYiKipb4bScc+G0h8qAIMmq4bSFOl0odGc6Ly91c2VyP2lkPXt1c2VyX2lkfSkqKiBge3VzZXJfaWR9YFxuIgoKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICByZXR1cm4gYXdhaXQgbWVzc2FnZS5yZXBseV90ZXh0KCLhtJvKnMmqcyDhtJxz4bSHyoAg4bSF4bSP4bSHc8m0J+G0myDhtId4yapz4bSbLiIsIHF1b3RlPVRydWUpCgogICAgdGV4dCArPSBmIioqW+G0hMqc4bSA4bSbIMmq4bSFOl0oaHR0cHM6Ly90Lm1lL3tjaGF0LnVzZXJuYW1lfSkqKiBge2NoYXQuaWR9YFxuXG4iCgogICAgaWYgKAogICAgICAgIG5vdCBnZXRhdHRyKHJlcGx5LCAiZW1wdHkiLCBUcnVlKQogICAgICAgIGFuZCBub3QgbWVzc2FnZS5mb3J3YXJkX2Zyb21fY2hhdAogICAgICAgIGFuZCBub3QgcmVwbHkuc2VuZGVyX2NoYXQKICAgICk6CiAgICAgICAgdGV4dCArPSBmIioqW8qA4bSH4bSYyp/JquG0h+G0hSDhtI3htIdzc+G0gMmi4bSHIMmq4bSFOl0oe3JlcGx5Lmxpbmt9KSoqIGB7cmVwbHkuaWR9YFxuIgogICAgICAgIHRleHQgKz0gZiIqKlvKgOG0h+G0mMqfyarhtIfhtIUg4bScc+G0h8qAIMmq4bSFOl0odGc6Ly91c2VyP2lkPXtyZXBseS5mcm9tX3VzZXIuaWR9KSoqIGB7cmVwbHkuZnJvbV91c2VyLmlkfWBcblxuIgoKICAgIGlmIHJlcGx5IGFuZCByZXBseS5mb3J3YXJkX2Zyb21fY2hhdDoKICAgICAgICB0ZXh0ICs9IGYi4bSbypzhtIcg0pPhtI/KgOG0oeG0gMqA4bSF4bSH4bSFIOG0hMqc4bSAybTJtOG0h8qfLCB7cmVwbHkuZm9yd2FyZF9mcm9tX2NoYXQudGl0bGV9LCDKnOG0gHMg4bSAybQgyarhtIUg4bSP0pMgYHtyZXBseS5mb3J3YXJkX2Zyb21fY2hhdC5pZH1gXG5cbiIKICAgICAgICBwcmludChyZXBseS5mb3J3YXJkX2Zyb21fY2hhdCkKCiAgICBpZiByZXBseSBhbmQgcmVwbHkuc2VuZGVyX2NoYXQ6CiAgICAgICAgdGV4dCArPSBmIsmq4bSFIOG0j9KTIOG0m8qc4bSHIMqA4bSH4bSYyp/JquG0h+G0hSDhtITKnOG0gOG0my/htITKnOG0gMm0ybThtIfKnywgyapzIGB7cmVwbHkuc2VuZGVyX2NoYXQuaWR9YCIKICAgICAgICBwcmludChyZXBseS5zZW5kZXJfY2hhdCkKCiAgICBhd2FpdCBtZXNzYWdlLnJlcGx5X3RleHQoCiAgICAgICAgdGV4dCwKICAgICAgICBkaXNhYmxlX3dlYl9wYWdlX3ByZXZpZXc9VHJ1ZSwKICAgICAgICBwYXJzZV9tb2RlPVBhcnNlTW9kZS5ERUZBVUxULAogICAgKQo=").decode("utf-8"))
+from pyrogram import Client, filters, types
+from Elevenyts import app
+
+def _user_link(user):
+    if user.username:
+        return f"@{user.username}"
+    return f'<a href="tg://user?id={user.id}">{user.first_name or "User"}</a>'
+
+@app.on_message(filters.command("id"))
+async def getid(client: Client, message: types.Message):
+    try:
+        if not message.from_user:
+            await message.reply_text("❌ I couldn't identify the sender of this message.")
+            return
+        target = message.from_user
+        if message.command and len(message.command) > 1:
+            try:
+                target = await client.get_users(message.command[1].strip())
+            except Exception:
+                await message.reply_text("❌ User not found. Use /id or /id @username.")
+                return
+        text = f"<b>👤 User ID</b>\nName: {_user_link(target)}\nID: <code>{target.id}</code>"
+        if message.chat and message.chat.type in ("group", "supergroup"):
+            text += f"\nChat ID: <code>{message.chat.id}</code>"
+        await message.reply_text(text, disable_web_page_preview=True)
+    except Exception:
+        try:
+            await message.reply_text("❌ Failed to get the user ID.")
+        except Exception:
+            pass
