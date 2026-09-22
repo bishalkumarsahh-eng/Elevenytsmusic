@@ -10,7 +10,7 @@ async def mention_admins(_, message: types.Message):
             reported_by += f" (@{sender.username})"
         excluded = {u.lstrip("@").lower() for u in config.EXCLUDED_USERNAMES if u}
         mentions = []
-        async for member in app.get_chat_members(message.chat.id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
+        for member in await app.get_chat_administrators(message.chat.id):
             user = member.user
             if not user or user.is_bot or user.is_deleted:
                 continue
@@ -28,7 +28,7 @@ async def mention_admins(_, message: types.Message):
         else:
             text = "<blockquote>❌ No visible human admins found.</blockquote>"
         await message.reply_text(text, disable_web_page_preview=True)
-    except Exception:
+    except Exception as e:
         try:
             await message.reply_text("<blockquote>❌ I couldn't fetch the group administrators. Make sure I am a member of this group and try again.</blockquote>")
         except Exception:
