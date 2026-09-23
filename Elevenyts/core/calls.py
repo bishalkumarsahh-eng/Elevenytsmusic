@@ -27,6 +27,7 @@ from pytgcalls.pytgcalls_session import PyTgCallsSession
 
 from Elevenyts import app, config, db, lang, logger, preload, queue, userbot, yt
 from Elevenyts.helpers import Media, Track, buttons, thumb
+from Elevenyts.helpers._emoji import next_play_emoji
 from Elevenyts.helpers.rich_player import send_player, edit_player
 
 # Suppress pytgcalls harmless errors (library bugs - not critical)
@@ -628,7 +629,7 @@ class TgCall(PyTgCalls):
                         try:
                             _autoplay_msg = await app.send_message(
                                 chat_id=target_chat,
-                                text="🎵 Autoplaying similar songs..."
+                                text=next_play_emoji()
                             )
                             _next_track = await yt.search_related(
                                 title=getattr(current, "ytitle", None) or getattr(current, "title", ""),
