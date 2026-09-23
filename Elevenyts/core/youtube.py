@@ -334,6 +334,60 @@ class YouTube:
                 logger.debug(f"Could not parse autoplay result: {e}")
         return tracks
 
+    async def search_related(self, title: str, channel_name: str = None, exclude_id: str = None, limit: int = 8) -> "Track | None":
+        """Find a different related track for autoplay, matching Moon_2's working flow."""
+        queries = []
+        if channel_name:
+            queries.append(f"{channel_name} songs")
+        clean_title = re.sub(r"\s*[-|].*", "", title or "").strip()
+        queries += [
+            f"{clean_title} similar songs",
+            f"songs like {clean_title}",
+            f"{clean_title} best songs",
+        ]
+        if channel_name:
+            queries.append(f"{channel_name} best songs")
+
+        tried = set()
+        for query in queries:
+            if not query or query in tried:
+                continue
+            tried.add(query)
+            try:
+                _search = VideosSearch(query, limit=limit)
+                results = await _search.next()
+            except Exception as e:
+                logger.debug(f"search_related query failed '{query}': {e}")
+                continue
+            if not results or not results.get("result"):
+                continue
+            candidates = [
+                r for r in results["result"]
+                if r.get("id") and r.get("link") and r.get("id") != exclude_id
+            ]
+            if not candidates:
+                continue
+            random.shuffle(candidates)
+            data = candidates[0]
+            duration = data.get("duration")
+            is_live = duration is None or duration == "LIVE"
+            if is_live:
+                continue
+            return Track(
+                id=data.get("id"),
+                channel_name=data.get("channel", {}).get("name"),
+                duration=duration,
+                duration_sec=utils.to_seconds(duration),
+                message_id=0,
+                title=(data.get("title") or "Unknown")[:25],
+                ytitle=data.get("title") or "Unknown",
+                thumbnail=(data.get("thumbnails") or [{}])[-1].get("url", "").split("?")[0],
+                url=data.get("link"),
+                view_count=data.get("viewCount", {}).get("short"),
+                is_live=False,
+            )
+        return None
+
     async def playlist(self, limit: int, user: str, url: str) -> list[Track]:
         """Extract tracks from a YouTube playlist."""
         try:

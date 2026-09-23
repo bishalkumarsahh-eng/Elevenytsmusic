@@ -52,7 +52,6 @@ class TgCall(PyTgCalls):
         self._play_next_locks = {}  # Lock to prevent concurrent play_next calls per chat
         self._stream_end_cache = {}  # Cache to prevent duplicate stream end processing
         self._autoplay = defaultdict(bool)  # Per-chat autoplay state
-        self._autoplay = defaultdict(bool)  # Per-chat autoplay state
 
     async def _edit_media_with_retry(self, message: Message, media_obj: InputMediaPhoto, reply_markup):
         """Edit media with basic FloodWait handling."""
@@ -621,50 +620,58 @@ class TgCall(PyTgCalls):
                 media = queue.get_next(chat_id)
 
                 if not media:
-                    # Autoplay: when the queue is empty, find a DIFFERENT
-                    # YouTube result and continue playback automatically.
-                    if self._autoplay.get(chat_id) and current and not getattr(current, "is_live", False):
-                        base_title = getattr(current, "ytitle", None) or getattr(current, "title", None) or ""
-                        channel = getattr(current, "channel_name", None) or ""
-                        current_id = str(getattr(current, "id", "") or "")
-                        candidates = []
-                        queries = [
-                            f"{channel} similar songs" if channel else "",
-                            f"{base_title} similar songs",
-                            f"{base_title} songs",
-                            f"{channel} latest songs" if channel else "",
-                            f"{channel} best songs" if channel else "",
-                        ]
-                        for related_query in dict.fromkeys(q for q in queries if q.strip()):
-                            try:
-                                found = await yt.search_many(related_query, 0, limit=8)
-                                candidates.extend(found)
-                            except Exception as search_ex:
-                                logger.warning(f"[AUTOPLAY] Search failed for {chat_id}: {search_ex}")
-
-                            # Stop once we have a usable different result.
-                            if any(str(getattr(x, "id", "")) != current_id for x in candidates):
-                                break
-
-                        next_track = next(
-                            (x for x in candidates
-                             if getattr(x, "id", None) and str(getattr(x, "id")) != current_id
-                             and not getattr(x, "is_live", False)),
-                            None,
-                        )
-                        if next_track:
-                            next_track.user = "Autoplay"
-                            queue.add(chat_id, next_track)
-                            logger.info(
-                                f"🎵 [AUTOPLAY] Continuing playback in {chat_id}: "
-                                f"{getattr(next_track, 'ytitle', next_track.title)}"
+                    # Autoplay: use the same working flow as Moon_2.
+                    # Capture the finished track BEFORE the queue advances,
+                    # then search/download/add/play it directly. Do NOT call
+                    # play_next() recursively while this lock is held.
+                    if current and loop_mode == 0 and self._autoplay.get(chat_id) and not getattr(current, "is_live", False):
+                        try:
+                            _autoplay_msg = await app.send_message(
+                                chat_id=target_chat,
+                                text="🎵 Autoplaying similar songs..."
                             )
-                            return await self.play_next(chat_id)
-
-                        logger.warning(
-                            f"🎵 [AUTOPLAY] Could not find a different track for {chat_id} "
-                            f"after {len(candidates)} candidates"
-                        )
+                            _next_track = await yt.search_related(
+                                title=getattr(current, "ytitle", None) or getattr(current, "title", ""),
+                                channel_name=getattr(current, "channel_name", None),
+                                exclude_id=getattr(current, "id", None),
+                            )
+                            if _next_track:
+                                _next_track.user = "Autoplay"
+                                if not getattr(_next_track, "file_path", None):
+                                    _next_track.file_path = await yt.download(
+                                        _next_track.id,
+                                        is_live=getattr(_next_track, "is_live", False),
+                                        video=getattr(_next_track, "video", False),
+                                    )
+                                if _next_track.file_path:
+                                    queue.add(chat_id, _next_track)
+                                    logger.info(
+                                        f"🎵 [AUTOPLAY] Continuing playback in {chat_id}: "
+                                        f"{getattr(_next_track, 'ytitle', getattr(_next_track, 'title', 'Unknown'))}"
+                                    )
+                                    # IMPORTANT: play directly because play_next() is
+                                    # already holding _play_next_locks[chat_id].
+                                    await self.play_media(
+                                        chat_id,
+                                        _autoplay_msg,
+                                        _next_track,
+                                        message_chat_id=message_chat_id,
+                                    )
+                                    try:
+                                        await preload.start_preload(chat_id, count=2)
+                                    except Exception:
+                                        pass
+                                    return
+                            if _autoplay_msg:
+                                try:
+                                    await _autoplay_msg.delete()
+                                except Exception:
+                                    pass
+                            logger.warning(
+                                f"🎵 [AUTOPLAY] Could not find/play a different track for {chat_id}"
+                            )
+                        except Exception as e:
+                            logger.warning(f"Autoplay failed for {chat_id}: {e}")
 
                     if config.AUTO_END:
                         _lang = await lang.get_lang(chat_id)
@@ -771,16 +778,6 @@ class TgCall(PyTgCalls):
                     await self.stop(chat_id)
                 except Exception:
                     pass
-
-    async def set_autoplay(self, chat_id: int, enabled: bool | None = None) -> bool:
-        """Enable/disable autoplay for a chat and return the new state."""
-        if enabled is None:
-            enabled = not self._autoplay.get(chat_id, False)
-        self._autoplay[chat_id] = bool(enabled)
-        return bool(enabled)
-
-    def autoplay_enabled(self, chat_id: int) -> bool:
-        return bool(self._autoplay.get(chat_id, False))
 
     async def set_autoplay(self, chat_id: int, enabled: bool | None = None) -> bool:
         """Enable/disable autoplay for a chat and return the new state."""
