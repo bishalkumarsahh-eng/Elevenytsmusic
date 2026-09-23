@@ -104,7 +104,7 @@ def controls_html(chat_id: int, media, *, timer: Optional[str] = None,
     # 2) Pause, Replay, Shuffle, Skip
     # 3) Loop, Close, Stop
     # 4) Autoplay: ON/OFF
-    autoplay_label = "ㅤㅤㅤㅤAutoplay: ONㅤㅤㅤㅤ" if autoplay else "ㅤㅤㅤㅤAutoplay: OFFㅤㅤㅤㅤ"
+    autoplay_label = "ㅤㅤㅤㅤㅤㅤㅤAutoplay: ONㅤㅤㅤㅤㅤㅤㅤ" if autoplay else "ㅤㅤㅤㅤㅤㅤㅤAutoplay: OFFㅤㅤㅤㅤㅤㅤㅤ"
     autoplay_style = "success" if autoplay else "primary"
     return (
         f'<tg-button-row align="center">'
