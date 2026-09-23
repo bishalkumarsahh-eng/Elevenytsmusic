@@ -377,7 +377,7 @@ class TgCall(PyTgCalls):
                     try:
                         ok = await edit_player(
                             target_chat_for_messages, media.message_id, text, media,
-                            playing=True, photo=_thumb, autoplay=self.autoplay_enabled(chat_id),
+                            playing=True, photo=_thumb, autoplay=bool(await db.get_autoplay(chat_id)),
                         )
                     except Exception as rich_error:
                         ok = False
@@ -391,7 +391,7 @@ class TgCall(PyTgCalls):
                         # Last resort: create a fresh player only if in-place edit fails.
                         try:
                             media.message_id = await send_player(
-                                target_chat_for_messages, text, _thumb, media, playing=True, autoplay=self.autoplay_enabled(chat_id)
+                                target_chat_for_messages, text, _thumb, media, playing=True, autoplay=bool(await db.get_autoplay(chat_id))
                             )
                         except Exception as rich_error:
                             logger.warning(f"Rich player send failed: {rich_error}")
@@ -403,7 +403,7 @@ class TgCall(PyTgCalls):
                             pass
                     try:
                         media.message_id = await send_player(
-                            target_chat_for_messages, text, _thumb, media, playing=True, autoplay=self.autoplay_enabled(chat_id)
+                            target_chat_for_messages, text, _thumb, media, playing=True, autoplay=bool(await db.get_autoplay(chat_id))
                         )
                     except Exception as rich_error:
                         logger.warning(f"Rich player failed: {rich_error}")
@@ -625,7 +625,7 @@ class TgCall(PyTgCalls):
                     # Capture the finished track BEFORE the queue advances,
                     # then search/download/add/play it directly. Do NOT call
                     # play_next() recursively while this lock is held.
-                    if current and loop_mode == 0 and self._autoplay.get(chat_id) and not getattr(current, "is_live", False):
+                    if current and loop_mode == 0 and await db.get_autoplay(chat_id) and not getattr(current, "is_live", False):
                         try:
                             _autoplay_msg = await app.send_message(
                                 chat_id=target_chat,
