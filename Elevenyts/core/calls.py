@@ -621,38 +621,50 @@ class TgCall(PyTgCalls):
                 media = queue.get_next(chat_id)
 
                 if not media:
-                    # Autoplay: when the queue is empty, search for a related
-                    # track based on the song that just finished and continue
-                    # playback automatically.
+                    # Autoplay: when the queue is empty, find a DIFFERENT
+                    # YouTube result and continue playback automatically.
                     if self._autoplay.get(chat_id) and current and not getattr(current, "is_live", False):
                         base_title = getattr(current, "ytitle", None) or getattr(current, "title", None) or ""
-                        if base_title:
-                            queries = [
-                                f"{base_title} official audio",
-                                f"{base_title} song",
-                                base_title,
-                            ]
-                            next_track = None
-                            for related_query in queries:
-                                try:
-                                    candidate = await yt.search(related_query, 0)
-                                except Exception as search_ex:
-                                    logger.warning(f"[AUTOPLAY] Search failed for {chat_id}: {search_ex}")
-                                    candidate = None
-                                if candidate and getattr(candidate, "id", None) != getattr(current, "id", None):
-                                    next_track = candidate
-                                    break
-                            if next_track:
-                                next_track.user = "Autoplay"
-                                queue.add(chat_id, next_track)
-                                logger.info(
-                                    f"🎵 [AUTOPLAY] Continuing playback in {chat_id}: "
-                                    f"{getattr(next_track, 'ytitle', next_track.title)}"
-                                )
-                                # queue.get_next() removes the finished track;
-                                # the newly added track is now the current item.
-                                return await self.play_next(chat_id)
-                            logger.warning(f"🎵 [AUTOPLAY] Could not find a different track for {chat_id}")
+                        channel = getattr(current, "channel_name", None) or ""
+                        current_id = str(getattr(current, "id", "") or "")
+                        candidates = []
+                        queries = [
+                            f"{channel} similar songs" if channel else "",
+                            f"{base_title} similar songs",
+                            f"{base_title} songs",
+                            f"{channel} latest songs" if channel else "",
+                            f"{channel} best songs" if channel else "",
+                        ]
+                        for related_query in dict.fromkeys(q for q in queries if q.strip()):
+                            try:
+                                found = await yt.search_many(related_query, 0, limit=8)
+                                candidates.extend(found)
+                            except Exception as search_ex:
+                                logger.warning(f"[AUTOPLAY] Search failed for {chat_id}: {search_ex}")
+
+                            # Stop once we have a usable different result.
+                            if any(str(getattr(x, "id", "")) != current_id for x in candidates):
+                                break
+
+                        next_track = next(
+                            (x for x in candidates
+                             if getattr(x, "id", None) and str(getattr(x, "id")) != current_id
+                             and not getattr(x, "is_live", False)),
+                            None,
+                        )
+                        if next_track:
+                            next_track.user = "Autoplay"
+                            queue.add(chat_id, next_track)
+                            logger.info(
+                                f"🎵 [AUTOPLAY] Continuing playback in {chat_id}: "
+                                f"{getattr(next_track, 'ytitle', next_track.title)}"
+                            )
+                            return await self.play_next(chat_id)
+
+                        logger.warning(
+                            f"🎵 [AUTOPLAY] Could not find a different track for {chat_id} "
+                            f"after {len(candidates)} candidates"
+                        )
 
                     if config.AUTO_END:
                         _lang = await lang.get_lang(chat_id)

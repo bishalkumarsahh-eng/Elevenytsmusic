@@ -301,6 +301,39 @@ class YouTube:
             return replace(track)
         return None
 
+    async def search_many(self, query: str, m_id: int, limit: int = 8) -> list[Track]:
+        """Search YouTube and return several distinct tracks for autoplay/selection."""
+        try:
+            _search = VideosSearch(query, limit=max(1, min(limit, 20)))
+            results = await _search.next()
+        except Exception as e:
+            logger.warning(f"⚠️ YouTube multi-search failed for '{query}': {e}")
+            return []
+
+        tracks = []
+        for data in (results or {}).get("result", []):
+            try:
+                duration = data.get("duration")
+                is_live = duration is None or duration == "LIVE"
+                track = Track(
+                    id=data.get("id"),
+                    channel_name=data.get("channel", {}).get("name"),
+                    duration=duration if not is_live else "LIVE",
+                    duration_sec=0 if is_live else utils.to_seconds(duration),
+                    message_id=m_id,
+                    title=(data.get("title") or "Unknown")[:25],
+                    ytitle=data.get("title") or "Unknown",
+                    thumbnail=(data.get("thumbnails") or [{}])[-1].get("url", "").split("?")[0],
+                    url=data.get("link"),
+                    view_count=data.get("viewCount", {}).get("short"),
+                    is_live=is_live,
+                )
+                if track.id:
+                    tracks.append(track)
+            except Exception as e:
+                logger.debug(f"Could not parse autoplay result: {e}")
+        return tracks
+
     async def playlist(self, limit: int, user: str, url: str) -> list[Track]:
         """Extract tracks from a YouTube playlist."""
         try:
