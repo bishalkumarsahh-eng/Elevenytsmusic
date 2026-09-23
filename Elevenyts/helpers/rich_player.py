@@ -73,7 +73,8 @@ def _styles(playing: bool):
 
 
 def controls_html(chat_id: int, media, *, timer: Optional[str] = None,
-                  playing: bool = True, remove: bool = False, queue_mode: bool = False) -> str:
+                  playing: bool = True, remove: bool = False, queue_mode: bool = False,
+                  autoplay: bool = False) -> str:
     if remove:
         return ""
 
@@ -97,10 +98,13 @@ def controls_html(chat_id: int, media, *, timer: Optional[str] = None,
             f'</tg-button-row>'
         )
 
-    # Clean, compact player layout:
-    # 1) Progress / time
-    # 2) Pause/Resume, Replay, Shuffle, Skip
+    # Exact requested player layout:
+    # 1) Time / progress
+    # 2) Pause, Replay, Shuffle, Skip
     # 3) Loop, Close, Stop
+    # 4) Autoplay: ON/OFF
+    autoplay_label = "Autoplay: ON" if autoplay else "Autoplay: OFF"
+    autoplay_style = "success" if autoplay else "primary"
     return (
         f'<tg-button-row align="center">'
         f'<tg-button type="callback_data" style="{time_style}" data="controls status {chat_id}">{p}</tg-button>'
@@ -115,6 +119,9 @@ def controls_html(chat_id: int, media, *, timer: Optional[str] = None,
         f'<tg-button type="callback_data" style="{queue_style}" data="controls loop {chat_id}">Loop</tg-button>'
         f'<tg-button type="callback_data" style="primary" data="controls close {chat_id}">Close</tg-button>'
         f'<tg-button type="callback_data" style="danger" data="controls stop {chat_id}">Stop</tg-button>'
+        f'</tg-button-row>'
+        f'<tg-button-row align="center">'
+        f'<tg-button type="callback_data" style="{autoplay_style}" data="controls autoplay {chat_id}">{autoplay_label}</tg-button>'
         f'</tg-button-row>'
     )
 
@@ -152,11 +159,11 @@ def _format_player_card(base_html: str) -> str:
 
 
 def rich_html(base_html: str, chat_id: int, media, *, timer=None,
-              playing=True, remove=False, queue_mode=False) -> str:
+              playing=True, remove=False, queue_mode=False, autoplay=False) -> str:
     clean = _format_player_card(base_html)
     if remove:
         return clean
-    return f"{clean}\n\n{controls_html(chat_id, media, timer=timer, playing=playing, queue_mode=queue_mode)}"
+    return f"{clean}\n\n{controls_html(chat_id, media, timer=timer, playing=playing, queue_mode=queue_mode, autoplay=autoplay)}"
 
 
 async def _request(method: str, data: dict, file_path: Optional[str] = None) -> dict:
@@ -209,8 +216,8 @@ def _cache_message_media(chat_id, message_id, result, fallback):
         _PLAYER_MEDIA[(chat_id, message_id)] = fallback
 
 
-async def send_player(chat_id: int, base_html: str, photo=None, media=None, reply_to_message_id=None, *, playing=True, queue_mode=False, **kwargs) -> int:
-    player_html = rich_html(base_html, chat_id, media, playing=playing, queue_mode=queue_mode)
+async def send_player(chat_id: int, base_html: str, photo=None, media=None, reply_to_message_id=None, *, playing=True, queue_mode=False, autoplay=False, **kwargs) -> int:
+    player_html = rich_html(base_html, chat_id, media, playing=playing, queue_mode=queue_mode, autoplay=autoplay)
     ref = _photo_source(chat_id, 0, media, photo)
     rich = {"html": player_html}
     if ref:
@@ -227,7 +234,7 @@ async def send_player(chat_id: int, base_html: str, photo=None, media=None, repl
 
 
 async def edit_player(chat_id: int, message_id: int, base_html: str, media, *, timer=None,
-                      playing=True, remove=False, photo=None) -> bool:
+                      playing=True, remove=False, photo=None, autoplay=False) -> bool:
     key = (chat_id, message_id)
     if remove:
         try:
