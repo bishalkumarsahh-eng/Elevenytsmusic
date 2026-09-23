@@ -1,3 +1,427 @@
-# Rich Player helpers
-import base64
-exec(base64.b64decode('aW1wb3J0IGh0bWwKaW1wb3J0IGpzb24KaW1wb3J0IG9zCmltcG9ydCByZQppbXBvcnQgdGltZQppbXBvcnQgdXJsbGliLnBhcnNlCmZyb20gdHlwaW5nIGltcG9ydCBPcHRpb25hbAppbXBvcnQgYWlvaHR0cAoKZnJvbSBFbGV2ZW55dHMgaW1wb3J0IGNvbmZpZwoKX1BMQVlFUl9QSE9UT1M6IGRpY3RbdHVwbGVbaW50LCBpbnRdLCBzdHJdID0ge30KX1BMQVlFUl9NRURJQTogZGljdFt0dXBsZVtpbnQsIGludF0sIHN0cl0gPSB7fQpfUExBWUVSX0xPQ0tTOiBkaWN0W3R1cGxlW2ludCwgaW50XSwgb2JqZWN0XSA9IHt9Cl9QTEFZRVJfQVVUT1BMQVk6IGRpY3RbaW50LCBib29sXSA9IHt9CgoKZGVmIF9hcGkobWV0aG9kOiBzdHIpIC0+IHN0cjoKICAgIHJldHVybiBmImh0dHBzOi8vYXBpLnRlbGVncmFtLm9yZy9ib3R7Y29uZmlnLkJPVF9UT0tFTn0ve21ldGhvZH0iCgoKZGVmIF92YWxpZF9odHRwX3VybCh2YWx1ZSkgLT4gYm9vbDoKICAgIGlmIG5vdCB2YWx1ZToKICAgICAgICByZXR1cm4gRmFsc2UKICAgIHRyeToKICAgICAgICBwID0gdXJsbGliLnBhcnNlLnVybHNwbGl0KHN0cih2YWx1ZSkuc3RyaXAoKSkKICAgICAgICByZXR1cm4gcC5zY2hlbWUgaW4gKCJodHRwIiwgImh0dHBzIikgYW5kIGJvb2wocC5uZXRsb2MpIGFuZCAocC5wb3J0IGlzIE5vbmUgb3IgMSA8PSBwLnBvcnQgPD0gNjU1MzUpCiAgICBleGNlcHQgKFZhbHVlRXJyb3IsIFR5cGVFcnJvcik6CiAgICAgICAgcmV0dXJuIEZhbHNlCgoKZGVmIF95b3V0dWJlX3RodW1iKG1lZGlhKSAtPiBPcHRpb25hbFtzdHJdOgogICAgdmlkID0gc3RyKGdldGF0dHIobWVkaWEsICJpZCIsICIiKSBvciAiIikKICAgIGlmIHJlLmZ1bGxtYXRjaChyIltBLVphLXowLTlfLV17NiwyMH0iLCB2aWQpOgogICAgICAgIHJldHVybiBmImh0dHBzOi8vaS55dGltZy5jb20vdmkve3ZpZH0vaHFkZWZhdWx0LmpwZyIKICAgIHJldHVybiBOb25lCgoKZGVmIF90aW1lKHNlYzogaW50LCBkdXJhdGlvbjogaW50KSAtPiBzdHI6CiAgICBzZWMgPSBtYXgoMCwgaW50KHNlYyBvciAwKSkKICAgIHJldHVybiB0aW1lLnN0cmZ0aW1lKCIlSDolTTolUyIgaWYgZHVyYXRpb24gPj0gMzYwMCBlbHNlICIlTTolUyIsIHRpbWUuZ210aW1lKHNlYykpCgoKZGVmIHByb2dyZXNzX3RleHQobWVkaWEsIHRpbWVyOiBPcHRpb25hbFtzdHJdID0gTm9uZSkgLT4gc3RyOgogICAgZHVyYXRpb24gPSBpbnQoZ2V0YXR0cihtZWRpYSwgImR1cmF0aW9uX3NlYyIsIDApIG9yIDApCiAgICBpZiBkdXJhdGlvbiA8PSAwOgogICAgICAgIHJldHVybiB0aW1lciBvciAiTElWRSIKICAgIHBsYXllZCA9IG1heCgwLCBtaW4oaW50KGZsb2F0KGdldGF0dHIobWVkaWEsICJ0aW1lIiwgMCkgb3IgMCkpLCBkdXJhdGlvbikpCiAgICBuID0gMTQKICAgIGZpbGxlZCA9IGludChyb3VuZChuICogcGxheWVkIC8gZHVyYXRpb24pKQogICAgYmFyID0gIuKUgSIgKiBmaWxsZWQgKyAi4pePIiArICLilIEiICogKG4gLSBmaWxsZWQpCiAgICByZXR1cm4gZiJ7X3RpbWUocGxheWVkLCBkdXJhdGlvbil9IHtiYXJ9IHtfdGltZShkdXJhdGlvbiwgZHVyYXRpb24pfSIKCgpkZWYgX2NsZWFuX2Jhc2VfaHRtbChiYXNlX2h0bWw6IHN0cikgLT4gc3RyOgogICAgIyBQcmVzZXJ2ZSB0aGUgYm90J3MgZXhpc3RpbmcgdGV4dCwgYm9sZC9pdGFsaWMvYmxvY2txdW90ZS9saW5rcy9ldGMuCiAgICAjIE9ubHkgcmVtb3ZlIG9sZCBSaWNoIGJ1dHRvbiByb3dzIHNvIGNvbnRyb2xzIGFyZSBnZW5lcmF0ZWQgZXhhY3RseSBvbmNlLgogICAgdGV4dCA9IGJhc2VfaHRtbCBvciAiIgogICAgdGV4dCA9IHJlLnN1YihyIjx0Zy1idXR0b24tcm93XGJbXj5dKj4uKj88L3RnLWJ1dHRvbi1yb3c+IiwgIiIsIHRleHQsIGZsYWdzPXJlLkkgfCByZS5TKQogICAgdGV4dCA9IHJlLnN1YihyJzxhXHMraHJlZj0oW14iXCc+XHNdKyk+Jywgcic8YSBocmVmPSJcMSI+JywgdGV4dCkKICAgIHRleHQgPSByZS5zdWIociJcbnszLH0iLCAiXG5cbiIsIHRleHQpLnN0cmlwKCkKICAgIHJldHVybiB0ZXh0CgoKZGVmIF9zdHlsZXMocGxheWluZzogYm9vbCk6CiAgICBwaGFzZSA9IGludCh0aW1lLnRpbWUoKSAvLyA1KSAlIDQgaWYgcGxheWluZyBlbHNlIDAKICAgIHBhbGV0dGVzID0gKAogICAgICAgICgic3VjY2VzcyIsICJwcmltYXJ5IiwgImRhbmdlciIsICJzdWNjZXNzIiksCiAgICAgICAgKCJwcmltYXJ5IiwgInN1Y2Nlc3MiLCAic3VjY2VzcyIsICJkYW5nZXIiKSwKICAgICAgICAoImRhbmdlciIsICJwcmltYXJ5IiwgInN1Y2Nlc3MiLCAicHJpbWFyeSIpLAogICAgICAgICgic3VjY2VzcyIsICJkYW5nZXIiLCAicHJpbWFyeSIsICJzdWNjZXNzIiksCiAgICApCiAgICByZXR1cm4gcGFsZXR0ZXNbcGhhc2VdCgoKZGVmIGNvbnRyb2xzX2h0bWwoY2hhdF9pZDogaW50LCBtZWRpYSwgKiwgdGltZXI6IE9wdGlvbmFsW3N0cl0gPSBOb25lLAogICAgICAgICAgICAgICAgICBwbGF5aW5nOiBib29sID0gVHJ1ZSwgcmVtb3ZlOiBib29sID0gRmFsc2UsIHF1ZXVlX21vZGU6IGJvb2wgPSBGYWxzZSwKICAgICAgICAgICAgICAgICAgYXV0b3BsYXk6IGJvb2wgPSBGYWxzZSkgLT4gc3RyOgogICAgaWYgcmVtb3ZlOgogICAgICAgIHJldHVybiAiIgoKICAgIHRpbWVfc3R5bGUsIHJlcGxheV9zdHlsZSwgc3RhdGVfc3R5bGUsIHF1ZXVlX3N0eWxlID0gX3N0eWxlcyhwbGF5aW5nKQogICAgc3RhdGUgPSAicGF1c2UiIGlmIHBsYXlpbmcgZWxzZSAicmVzdW1lIgogICAgbGFiZWwgPSAiUGF1c2UiIGlmIHBsYXlpbmcgZWxzZSAiUmVzdW1lIgogICAgcCA9IGh0bWwuZXNjYXBlKHByb2dyZXNzX3RleHQobWVkaWEsIHRpbWVyKSkKCiAgICAjIFF1ZXVlLW1lc3NhZ2UgY29udHJvbHM6IG1hdGNoIHRoZSBleGlzdGluZyBxdWV1ZSBrZXlib2FyZCwgYnV0IHJlbmRlcgogICAgIyB0aGVtIGluc2lkZSB0aGUgUmljaCBNZXNzYWdlIGl0c2VsZiBpbnN0ZWFkIG9mIGFzIGEgc2VwYXJhdGUga2V5Ym9hcmQuCiAgICBpZiBxdWV1ZV9tb2RlOgogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgIGYnPHRnLWJ1dHRvbi1yb3cgYWxpZ249ImNlbnRlciI+JwogICAgICAgICAgICBmJzx0Zy1idXR0b24gdHlwZT0iY2FsbGJhY2tfZGF0YSIgc3R5bGU9InN1Y2Nlc3MiIGRhdGE9ImNvbnRyb2xzIHJlc3VtZSB7Y2hhdF9pZH0iPuKWtzwvdGctYnV0dG9uPicKICAgICAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJwcmltYXJ5IiBkYXRhPSJjb250cm9scyBwYXVzZSB7Y2hhdF9pZH0iPuKIoyDiiKM8L3RnLWJ1dHRvbj4nCiAgICAgICAgICAgIGYnPHRnLWJ1dHRvbiB0eXBlPSJjYWxsYmFja19kYXRhIiBzdHlsZT0icHJpbWFyeSIgZGF0YT0iY29udHJvbHMgc2tpcCB7Y2hhdF9pZH0iPj4+PC90Zy1idXR0b24+JwogICAgICAgICAgICBmJzx0Zy1idXR0b24gdHlwZT0iY2FsbGJhY2tfZGF0YSIgc3R5bGU9ImRhbmdlciIgZGF0YT0iY29udHJvbHMgc3RvcCB7Y2hhdF9pZH0iPuKWozwvdGctYnV0dG9uPicKICAgICAgICAgICAgZic8L3RnLWJ1dHRvbi1yb3c+JwogICAgICAgICAgICBmJzx0Zy1idXR0b24tcm93IGFsaWduPSJjZW50ZXIiPicKICAgICAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJkYW5nZXIiIGRhdGE9ImNvbnRyb2xzIGNsb3NlIHtjaGF0X2lkfSI+8J+XkTwvdGctYnV0dG9uPicKICAgICAgICAgICAgZic8L3RnLWJ1dHRvbi1yb3c+JwogICAgICAgICkKCiAgICAjIEV4YWN0IHJlcXVlc3RlZCBwbGF5ZXIgbGF5b3V0OgogICAgIyAxKSBUaW1lIC8gcHJvZ3Jlc3MKICAgICMgMikgUGF1c2UsIFJlcGxheSwgU2h1ZmZsZSwgU2tpcAogICAgIyAzKSBMb29wLCBDbG9zZSwgU3RvcAogICAgIyA0KSBBdXRvcGxheTogT04vT0ZGCiAgICBhdXRvcGxheV9sYWJlbCA9ICJBdXRvcGxheTogT04iIGlmIGF1dG9wbGF5IGVsc2UgIkF1dG9wbGF5OiBPRkYiCiAgICBhdXRvcGxheV9zdHlsZSA9ICJzdWNjZXNzIiBpZiBhdXRvcGxheSBlbHNlICJwcmltYXJ5IgogICAgcmV0dXJuICgKICAgICAgICBmJzx0Zy1idXR0b24tcm93IGFsaWduPSJjZW50ZXIiPicKICAgICAgICBmJzx0Zy1idXR0b24gdHlwZT0iY2FsbGJhY2tfZGF0YSIgc3R5bGU9Int0aW1lX3N0eWxlfSIgZGF0YT0iY29udHJvbHMgc3RhdHVzIHtjaGF0X2lkfSI+e3B9PC90Zy1idXR0b24+JwogICAgICAgIGYnPC90Zy1idXR0b24tcm93PicKICAgICAgICBmJzx0Zy1idXR0b24tcm93IGFsaWduPSJjZW50ZXIiPicKICAgICAgICBmJzx0Zy1idXR0b24gdHlwZT0iY2FsbGJhY2tfZGF0YSIgc3R5bGU9IntzdGF0ZV9zdHlsZX0iIGRhdGE9ImNvbnRyb2xzIHtzdGF0ZX0ge2NoYXRfaWR9Ij57bGFiZWx9PC90Zy1idXR0b24+JwogICAgICAgIGYnPHRnLWJ1dHRvbiB0eXBlPSJjYWxsYmFja19kYXRhIiBzdHlsZT0ie3RpbWVfc3R5bGV9IiBkYXRhPSJjb250cm9scyByZXBsYXkge2NoYXRfaWR9Ij5SZXBsYXk8L3RnLWJ1dHRvbj4nCiAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJ7cmVwbGF5X3N0eWxlfSIgZGF0YT0iY29udHJvbHMgc2h1ZmZsZSB7Y2hhdF9pZH0iPlNodWZmbGU8L3RnLWJ1dHRvbj4nCiAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJ7cXVldWVfc3R5bGV9IiBkYXRhPSJjb250cm9scyBza2lwIHtjaGF0X2lkfSI+U2tpcDwvdGctYnV0dG9uPicKICAgICAgICBmJzwvdGctYnV0dG9uLXJvdz4nCiAgICAgICAgZic8dGctYnV0dG9uLXJvdyBhbGlnbj0iY2VudGVyIj4nCiAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJ7cXVldWVfc3R5bGV9IiBkYXRhPSJjb250cm9scyBsb29wIHtjaGF0X2lkfSI+TG9vcDwvdGctYnV0dG9uPicKICAgICAgICBmJzx0Zy1idXR0b24gdHlwZT0iY2FsbGJhY2tfZGF0YSIgc3R5bGU9InByaW1hcnkiIGRhdGE9ImNvbnRyb2xzIGNsb3NlIHtjaGF0X2lkfSI+Q2xvc2U8L3RnLWJ1dHRvbj4nCiAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJkYW5nZXIiIGRhdGE9ImNvbnRyb2xzIHN0b3Age2NoYXRfaWR9Ij5TdG9wPC90Zy1idXR0b24+JwogICAgICAgIGYnPC90Zy1idXR0b24tcm93PicKICAgICAgICBmJzx0Zy1idXR0b24tcm93IGFsaWduPSJjZW50ZXIiPicKICAgICAgICBmJzx0Zy1idXR0b24gdHlwZT0iY2FsbGJhY2tfZGF0YSIgc3R5bGU9InthdXRvcGxheV9zdHlsZX0iIGRhdGE9ImNvbnRyb2xzIGF1dG9wbGF5IHtjaGF0X2lkfSI+e2F1dG9wbGF5X2xhYmVsfTwvdGctYnV0dG9uPicKICAgICAgICBmJzwvdGctYnV0dG9uLXJvdz4nCiAgICApCgoKZGVmIF9mb3JtYXRfcGxheWVyX2NhcmQoYmFzZV9odG1sOiBzdHIpIC0+IHN0cjoKICAgICIiIkFycmFuZ2UgdGhlIGN1cnJlbnQtcGxheWluZyBjYXJkIGxpa2UgdGhlIHF1ZXVlIGNhcmQuCgogICAgTGF5b3V0OgogICAgICAxLiBIZWFkZXIvc3RhdHVzIGxpbmUgaW4gaXRzIG93biBxdW90ZSBibG9jay4KICAgICAgMi4gVGl0bGUsIGR1cmF0aW9uIGFuZCByZXF1ZXN0ZXIgaW4gb25lIGRldGFpbHMgYmxvY2suCiAgICAgIDMuIEFueSByZW1haW5pbmcgZm9vdGVyL3Bvd2VyZWQtYnkgY29udGVudCBpbiBpdHMgb3duIGJsb2NrLgoKICAgIEV4aXN0aW5nIGJsb2NrcXVvdGUgd3JhcHBlcnMgYXJlIHJlbW92ZWQgZmlyc3Qgc28gd2UgbmV2ZXIgY3JlYXRlIG5lc3RlZAogICAgcXVvdGUgY2FyZHMgd2hlbiBhIGxlZ2FjeSB0ZW1wbGF0ZSBhbHJlYWR5IGNvbnRhaW5zIHRoZW0uCiAgICAiIiIKICAgIGNsZWFuID0gX2NsZWFuX2Jhc2VfaHRtbChiYXNlX2h0bWwpCiAgICBjbGVhbiA9IHJlLnN1YihyIjwvP2Jsb2NrcXVvdGVcYltePl0qPiIsICIiLCBjbGVhbiwgZmxhZ3M9cmUuSSkKICAgIGNsZWFuID0gcmUuc3ViKHIiXG57Myx9IiwgIlxuXG4iLCBjbGVhbikuc3RyaXAoKQogICAgbGluZXMgPSBbbGluZS5zdHJpcCgpIGZvciBsaW5lIGluIGNsZWFuLnNwbGl0bGluZXMoKSBpZiBsaW5lLnN0cmlwKCldCgogICAgaWYgbGVuKGxpbmVzKSA+PSA1OgogICAgICAgIGhlYWRlciA9IGxpbmVzWzBdCiAgICAgICAgZGV0YWlscyA9ICI8YnI+Ii5qb2luKGxpbmVzWzE6NF0pCiAgICAgICAgZm9vdGVyID0gIjxicj4iLmpvaW4obGluZXNbNDpdKQogICAgICAgIHJldHVybiAoCiAgICAgICAgICAgIGYnPGJsb2NrcXVvdGU+e2hlYWRlcn08L2Jsb2NrcXVvdGU+JwogICAgICAgICAgICBmJzxibG9ja3F1b3RlPntkZXRhaWxzfTwvYmxvY2txdW90ZT4nCiAgICAgICAgICAgIGYnPGJsb2NrcXVvdGU+e2Zvb3Rlcn08L2Jsb2NrcXVvdGU+JwogICAgICAgICkKICAgIGlmIGxlbihsaW5lcykgPj0gMjoKICAgICAgICBoZWFkZXIgPSBsaW5lc1swXQogICAgICAgIGRldGFpbHMgPSAiPGJyPiIuam9pbihsaW5lc1sxOl0pCiAgICAgICAgcmV0dXJuIGYnPGJsb2NrcXVvdGU+e2hlYWRlcn08L2Jsb2NrcXVvdGU+PGJsb2NrcXVvdGU+e2RldGFpbHN9PC9ibG9ja3F1b3RlPicKICAgIHJldHVybiBmJzxibG9ja3F1b3RlPntjbGVhbn08L2Jsb2NrcXVvdGU+JyBpZiBjbGVhbiBlbHNlICIiCgoKZGVmIHJpY2hfaHRtbChiYXNlX2h0bWw6IHN0ciwgY2hhdF9pZDogaW50LCBtZWRpYSwgKiwgdGltZXI9Tm9uZSwKICAgICAgICAgICAgICBwbGF5aW5nPVRydWUsIHJlbW92ZT1GYWxzZSwgcXVldWVfbW9kZT1GYWxzZSwgYXV0b3BsYXk9RmFsc2UpIC0+IHN0cjoKICAgIGNsZWFuID0gX2Zvcm1hdF9wbGF5ZXJfY2FyZChiYXNlX2h0bWwpCiAgICBpZiByZW1vdmU6CiAgICAgICAgcmV0dXJuIGNsZWFuCiAgICByZXR1cm4gZiJ7Y2xlYW59XG5cbntjb250cm9sc19odG1sKGNoYXRfaWQsIG1lZGlhLCB0aW1lcj10aW1lciwgcGxheWluZz1wbGF5aW5nLCBxdWV1ZV9tb2RlPXF1ZXVlX21vZGUsIGF1dG9wbGF5PWF1dG9wbGF5KX0iCgoKYXN5bmMgZGVmIF9yZXF1ZXN0KG1ldGhvZDogc3RyLCBkYXRhOiBkaWN0LCBmaWxlX3BhdGg6IE9wdGlvbmFsW3N0cl0gPSBOb25lKSAtPiBkaWN0OgogICAgdGltZW91dCA9IGFpb2h0dHAuQ2xpZW50VGltZW91dCh0b3RhbD05MCkKICAgIGFzeW5jIHdpdGggYWlvaHR0cC5DbGllbnRTZXNzaW9uKHRpbWVvdXQ9dGltZW91dCkgYXMgc2Vzc2lvbjoKICAgICAgICBpZiBmaWxlX3BhdGggYW5kIG9zLnBhdGguaXNmaWxlKGZpbGVfcGF0aCk6CiAgICAgICAgICAgIGZvcm0gPSBhaW9odHRwLkZvcm1EYXRhKCkKICAgICAgICAgICAgZm9yIGssIHYgaW4gZGF0YS5pdGVtcygpOgogICAgICAgICAgICAgICAgZm9ybS5hZGRfZmllbGQoaywganNvbi5kdW1wcyh2LCBlbnN1cmVfYXNjaWk9RmFsc2UpIGlmIGlzaW5zdGFuY2UodiwgKGRpY3QsIGxpc3QpKSBlbHNlIHN0cih2KSkKICAgICAgICAgICAgd2l0aCBvcGVuKGZpbGVfcGF0aCwgInJiIikgYXMgZnA6CiAgICAgICAgICAgICAgICBmb3JtLmFkZF9maWVsZCgicGxheWVyX2NvdmVyIiwgZnAsIGZpbGVuYW1lPW9zLnBhdGguYmFzZW5hbWUoZmlsZV9wYXRoKSwgY29udGVudF90eXBlPSJpbWFnZS9qcGVnIikKICAgICAgICAgICAgICAgIGFzeW5jIHdpdGggc2Vzc2lvbi5wb3N0KF9hcGkobWV0aG9kKSwgZGF0YT1mb3JtKSBhcyByOgogICAgICAgICAgICAgICAgICAgIHJlc3VsdCA9IGF3YWl0IHIuanNvbihjb250ZW50X3R5cGU9Tm9uZSkKICAgICAgICBlbHNlOgogICAgICAgICAgICBhc3luYyB3aXRoIHNlc3Npb24ucG9zdChfYXBpKG1ldGhvZCksIGpzb249ZGF0YSkgYXMgcjoKICAgICAgICAgICAgICAgIHJlc3VsdCA9IGF3YWl0IHIuanNvbihjb250ZW50X3R5cGU9Tm9uZSkKICAgIGlmIG5vdCByZXN1bHQuZ2V0KCJvayIpOgogICAgICAgIHJhaXNlIFJ1bnRpbWVFcnJvcihyZXN1bHQuZ2V0KCJkZXNjcmlwdGlvbiIsIGYiVGVsZWdyYW0ge21ldGhvZH0gZmFpbGVkIikpCiAgICByZXR1cm4gcmVzdWx0CgoKZGVmIF9waG90b19zb3VyY2UoY2hhdF9pZCwgbWVzc2FnZV9pZCwgbWVkaWEsIHBob3RvPU5vbmUpOgogICAgIyBQcmVmZXIgVGVsZWdyYW0ncyBhbHJlYWR5LXVwbG9hZGVkIHBob3RvIGZpbGVfaWQuIFRoaXMgaXMgdGhlIGtleSB0bwogICAgIyBrZWVwaW5nIHRoZSBjb3ZlciBhdHRhY2hlZCB3aGVuIHRoZSBSaWNoIE1lc3NhZ2UgaXMgZWRpdGVkIHJlcGVhdGVkbHkuCiAgICBjYWNoZWRfZmlsZV9pZCA9IF9QTEFZRVJfUEhPVE9TLmdldCgoY2hhdF9pZCwgbWVzc2FnZV9pZCkpCiAgICBpZiBjYWNoZWRfZmlsZV9pZDoKICAgICAgICByZXR1cm4gY2FjaGVkX2ZpbGVfaWQKICAgIGNhY2hlZCA9IF9QTEFZRVJfTUVESUEuZ2V0KChjaGF0X2lkLCBtZXNzYWdlX2lkKSkKICAgIGlmIGNhY2hlZDoKICAgICAgICByZXR1cm4gY2FjaGVkCiAgICBpZiBfdmFsaWRfaHR0cF91cmwocGhvdG8pOgogICAgICAgIHJldHVybiBzdHIocGhvdG8pLnN0cmlwKCkKICAgIHRodW1iID0gZ2V0YXR0cihtZWRpYSwgInRodW1ibmFpbCIsIE5vbmUpCiAgICBpZiBfdmFsaWRfaHR0cF91cmwodGh1bWIpOgogICAgICAgIHJldHVybiBzdHIodGh1bWIpLnN0cmlwKCkKICAgIHJldHVybiBfeW91dHViZV90aHVtYihtZWRpYSkKCgpkZWYgX2NhY2hlX21lc3NhZ2VfbWVkaWEoY2hhdF9pZCwgbWVzc2FnZV9pZCwgcmVzdWx0LCBmYWxsYmFjayk6CiAgICB0cnk6CiAgICAgICAgbXNnID0gcmVzdWx0LmdldCgicmVzdWx0Iikgb3Ige30KICAgICAgICBwaG90b3MgPSBtc2cuZ2V0KCJwaG90byIpIG9yIFtdCiAgICAgICAgaWYgcGhvdG9zOgogICAgICAgICAgICBmaWQgPSBwaG90b3NbLTFdLmdldCgiZmlsZV9pZCIpCiAgICAgICAgICAgIGlmIGZpZDoKICAgICAgICAgICAgICAgIF9QTEFZRVJfUEhPVE9TWyhjaGF0X2lkLCBtZXNzYWdlX2lkKV0gPSBmaWQKICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgcGFzcwogICAgaWYgZmFsbGJhY2s6CiAgICAgICAgX1BMQVlFUl9NRURJQVsoY2hhdF9pZCwgbWVzc2FnZV9pZCldID0gZmFsbGJhY2sKCgphc3luYyBkZWYgc2VuZF9wbGF5ZXIoY2hhdF9pZDogaW50LCBiYXNlX2h0bWw6IHN0ciwgcGhvdG89Tm9uZSwgbWVkaWE9Tm9uZSwgcmVwbHlfdG9fbWVzc2FnZV9pZD1Ob25lLCAqLCBwbGF5aW5nPVRydWUsIHF1ZXVlX21vZGU9RmFsc2UsIGF1dG9wbGF5PU5vbmUsICoqa3dhcmdzKSAtPiBpbnQ6CiAgICBpZiBhdXRvcGxheSBpcyBOb25lOgogICAgICAgIGF1dG9wbGF5ID0gYm9vbChfUExBWUVSX0FVVE9QTEFZLmdldChjaGF0X2lkLCBGYWxzZSkpCiAgICBlbHNlOgogICAgICAgIGF1dG9wbGF5ID0gYm9vbChhdXRvcGxheSkKICAgICAgICBfUExBWUVSX0FVVE9QTEFZW2NoYXRfaWRdID0gYXV0b3BsYXkKICAgIHBsYXllcl9odG1sID0gcmljaF9odG1sKGJhc2VfaHRtbCwgY2hhdF9pZCwgbWVkaWEsIHBsYXlpbmc9cGxheWluZywgcXVldWVfbW9kZT1xdWV1ZV9tb2RlLCBhdXRvcGxheT1hdXRvcGxheSkKICAgIHJlZiA9IF9waG90b19zb3VyY2UoY2hhdF9pZCwgMCwgbWVkaWEsIHBob3RvKQogICAgcmljaCA9IHsiaHRtbCI6IHBsYXllcl9odG1sfQogICAgaWYgcmVmOgogICAgICAgIHJpY2hbImh0bWwiXSA9IGYnPGltZyBzcmM9InRnOi8vcGhvdG8/aWQ9cGxheWVyX2NvdmVyIi8+XG57cGxheWVyX2h0bWx9JwogICAgICAgIHJpY2hbIm1lZGlhIl0gPSBbeyJpZCI6ICJwbGF5ZXJfY292ZXIiLCAibWVkaWEiOiB7InR5cGUiOiAicGhvdG8iLCAibWVkaWEiOiByZWZ9fV0KICAgIGRhdGEgPSB7ImNoYXRfaWQiOiBjaGF0X2lkLCAicmljaF9tZXNzYWdlIjogcmljaH0KICAgIGlmIHJlcGx5X3RvX21lc3NhZ2VfaWQ6CiAgICAgICAgZGF0YVsicmVwbHlfcGFyYW1ldGVycyJdID0geyJtZXNzYWdlX2lkIjogaW50KHJlcGx5X3RvX21lc3NhZ2VfaWQpfQogICAgcmVzdWx0ID0gYXdhaXQgX3JlcXVlc3QoInNlbmRSaWNoTWVzc2FnZSIsIGRhdGEpCiAgICBtc2cgPSByZXN1bHRbInJlc3VsdCJdCiAgICBtaWQgPSBpbnQobXNnWyJtZXNzYWdlX2lkIl0pCiAgICBfY2FjaGVfbWVzc2FnZV9tZWRpYShjaGF0X2lkLCBtaWQsIHJlc3VsdCwgcmVmKQogICAgcmV0dXJuIG1pZAoKCmFzeW5jIGRlZiBlZGl0X3BsYXllcihjaGF0X2lkOiBpbnQsIG1lc3NhZ2VfaWQ6IGludCwgYmFzZV9odG1sOiBzdHIsIG1lZGlhLCAqLCB0aW1lcj1Ob25lLAogICAgICAgICAgICAgICAgICAgICAgcGxheWluZz1UcnVlLCByZW1vdmU9RmFsc2UsIHBob3RvPU5vbmUsIGF1dG9wbGF5PU5vbmUpIC0+IGJvb2w6CiAgICBrZXkgPSAoY2hhdF9pZCwgbWVzc2FnZV9pZCkKICAgIGlmIGF1dG9wbGF5IGlzIE5vbmU6CiAgICAgICAgYXV0b3BsYXkgPSBib29sKF9QTEFZRVJfQVVUT1BMQVkuZ2V0KGNoYXRfaWQsIEZhbHNlKSkKICAgIGVsc2U6CiAgICAgICAgYXV0b3BsYXkgPSBib29sKGF1dG9wbGF5KQogICAgICAgIF9QTEFZRVJfQVVUT1BMQVlbY2hhdF9pZF0gPSBhdXRvcGxheQogICAgaWYgcmVtb3ZlOgogICAgICAgIHRyeToKICAgICAgICAgICAgYXdhaXQgX3JlcXVlc3QoImRlbGV0ZU1lc3NhZ2UiLCB7ImNoYXRfaWQiOiBjaGF0X2lkLCAibWVzc2FnZV9pZCI6IG1lc3NhZ2VfaWR9KQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgIHJldHVybiBGYWxzZQogICAgICAgIF9QTEFZRVJfUEhPVE9TLnBvcChrZXksIE5vbmUpCiAgICAgICAgX1BMQVlFUl9NRURJQS5wb3Aoa2V5LCBOb25lKQogICAgICAgIF9QTEFZRVJfQVVUT1BMQVkucG9wKGNoYXRfaWQsIE5vbmUpCiAgICAgICAgcmV0dXJuIFRydWUKCiAgICBsb2NrID0gX1BMQVlFUl9MT0NLUy5nZXQoa2V5KQogICAgaWYgbG9jayBpcyBOb25lOgogICAgICAgIGltcG9ydCBhc3luY2lvCiAgICAgICAgbG9jayA9IGFzeW5jaW8uTG9jaygpCiAgICAgICAgX1BMQVlFUl9MT0NLU1trZXldID0gbG9jawoKICAgIGFzeW5jIHdpdGggbG9jazoKICAgICAgICByZWYgPSBfcGhvdG9fc291cmNlKGNoYXRfaWQsIG1lc3NhZ2VfaWQsIG1lZGlhLCBwaG90bykKICAgICAgICBib2R5ID0gcmljaF9odG1sKGJhc2VfaHRtbCwgY2hhdF9pZCwgbWVkaWEsIHRpbWVyPXRpbWVyLCBwbGF5aW5nPXBsYXlpbmcsIGF1dG9wbGF5PWF1dG9wbGF5KQogICAgICAgIHJpY2ggPSB7Imh0bWwiOiBib2R5fQogICAgICAgIGlmIHJlZjoKICAgICAgICAgICAgcmljaFsiaHRtbCJdID0gZic8aW1nIHNyYz0idGc6Ly9waG90bz9pZD1wbGF5ZXJfY292ZXIiLz5cbntib2R5fScKICAgICAgICAgICAgcmljaFsibWVkaWEiXSA9IFt7ImlkIjogInBsYXllcl9jb3ZlciIsICJtZWRpYSI6IHsidHlwZSI6ICJwaG90byIsICJtZWRpYSI6IHJlZn19XQogICAgICAgIHRyeToKICAgICAgICAgICAgcmVzdWx0ID0gYXdhaXQgX3JlcXVlc3QoImVkaXRNZXNzYWdlVGV4dCIsIHsKICAgICAgICAgICAgICAgICJjaGF0X2lkIjogY2hhdF9pZCwKICAgICAgICAgICAgICAgICJtZXNzYWdlX2lkIjogbWVzc2FnZV9pZCwKICAgICAgICAgICAgICAgICJyaWNoX21lc3NhZ2UiOiByaWNoLAogICAgICAgICAgICB9KQogICAgICAgICAgICBpZiBpc2luc3RhbmNlKHJlc3VsdCwgZGljdCk6CiAgICAgICAgICAgICAgICBfY2FjaGVfbWVzc2FnZV9tZWRpYShjaGF0X2lkLCBtZXNzYWdlX2lkLCByZXN1bHQsIHJlZikKICAgICAgICAgICAgZWxpZiByZWY6CiAgICAgICAgICAgICAgICBfUExBWUVSX01FRElBW2tleV0gPSByZWYKICAgICAgICAgICAgcmV0dXJuIFRydWUKICAgICAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgICAgIGlmICJNRVNTQUdFX05PVF9NT0RJRklFRCIgaW4gc3RyKGUpOgogICAgICAgICAgICAgICAgcmV0dXJuIFRydWUKICAgICAgICAgICAgIyBJZiBhbiBlZGl0IHdpdGhvdXQgbWVkaWEgc29tZWhvdyBoYXBwZW5lZCwgaW1tZWRpYXRlbHkgcmV0cnkKICAgICAgICAgICAgIyBvbmNlIHdpdGggdGhlIGNhY2hlZCBUZWxlZ3JhbSBwaG90by9maWxlIHJlZmVyZW5jZS4KICAgICAgICAgICAgY2FjaGVkID0gX1BMQVlFUl9QSE9UT1MuZ2V0KGtleSkgb3IgX1BMQVlFUl9NRURJQS5nZXQoa2V5KQogICAgICAgICAgICBpZiBjYWNoZWQgYW5kIGNhY2hlZCAhPSByZWY6CiAgICAgICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICAgICAgcmljaFsiaHRtbCJdID0gZic8aW1nIHNyYz0idGc6Ly9waG90bz9pZD1wbGF5ZXJfY292ZXIiLz5cbntib2R5fScKICAgICAgICAgICAgICAgICAgICByaWNoWyJtZWRpYSJdID0gW3siaWQiOiAicGxheWVyX2NvdmVyIiwgIm1lZGlhIjogeyJ0eXBlIjogInBob3RvIiwgIm1lZGlhIjogY2FjaGVkfX1dCiAgICAgICAgICAgICAgICAgICAgcmVzdWx0ID0gYXdhaXQgX3JlcXVlc3QoImVkaXRNZXNzYWdlVGV4dCIsIHsKICAgICAgICAgICAgICAgICAgICAgICAgImNoYXRfaWQiOiBjaGF0X2lkLAogICAgICAgICAgICAgICAgICAgICAgICAibWVzc2FnZV9pZCI6IG1lc3NhZ2VfaWQsCiAgICAgICAgICAgICAgICAgICAgICAgICJyaWNoX21lc3NhZ2UiOiByaWNoLAogICAgICAgICAgICAgICAgICAgIH0pCiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIFRydWUKICAgICAgICAgICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgICAgICAgICAgcGFzcwogICAgICAgICAgICByZXR1cm4gRmFsc2UKCgphc3luYyBkZWYgZWRpdF9yaWNoX21lc3NhZ2UobWVzc2FnZSwgdGV4dCwgbWFya3VwPU5vbmUsIHBob3RvX2ZpbGVfaWQ9Tm9uZSwgKiprd2FyZ3MpOgogICAgY2hhdF9pZCA9IGludChtZXNzYWdlLmNoYXQuaWQpCiAgICBtZXNzYWdlX2lkID0gaW50KG1lc3NhZ2UuaWQpCiAgICBtZWRpYSA9IGt3YXJncy5nZXQoIm1lZGlhIikKICAgIGlmIG1lZGlhIGlzIE5vbmU6CiAgICAgICAgdHJ5OgogICAgICAgICAgICBmcm9tIEVsZXZlbnl0cyBpbXBvcnQgcXVldWUKICAgICAgICAgICAgbWVkaWEgPSBxdWV1ZS5nZXRfY3VycmVudChjaGF0X2lkKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgIG1lZGlhID0gTm9uZQogICAgaWYgbWVkaWEgaXMgbm90IE5vbmU6CiAgICAgICAgcmV0dXJuIGF3YWl0IGVkaXRfcGxheWVyKGNoYXRfaWQsIG1lc3NhZ2VfaWQsIHRleHQsIG1lZGlhLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aW1lcj1rd2FyZ3MuZ2V0KCJ0aW1lciIpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwbGF5aW5nPWt3YXJncy5nZXQoInBsYXlpbmciLCBUcnVlKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVtb3ZlPWt3YXJncy5nZXQoInJlbW92ZSIsIEZhbHNlKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcGhvdG89cGhvdG9fZmlsZV9pZCkKICAgIHJldHVybiBGYWxzZQoKCgoKCmRlZiBxdWV1ZV9jb250cm9sc19odG1sKGNoYXRfaWQ6IGludCwgaXRlbV9pZDogc3RyKSAtPiBzdHI6CiAgICAiIiJDb250cm9scyBmb3IgYSBxdWV1ZWQgc29uZy4KCiAgICBQbGF5IE5vdyBvY2N1cGllcyBhIGZ1bGwgcm93LiBTdG9wIGFuZCBDbG9zZSBzaGFyZSB0aGUgc2Vjb25kIHJvdy4KICAgIFBsYXkgTm93IGNhcnJpZXMgdGhlIHF1ZXVlZCBpdGVtJ3MgSUQgc28gdGhlIGNhbGxiYWNrIGNhbiBwcm9tb3RlIHRoYXQKICAgIGV4YWN0IHNvbmcgd2l0aG91dCBjaGFuZ2luZyB0aGUgcmVsYXRpdmUgb3JkZXIgb2YgdGhlIG90aGVyIHdhaXRpbmcgc29uZ3MuCiAgICAiIiIKICAgIHNhZmVfaXRlbV9pZCA9IGh0bWwuZXNjYXBlKHN0cihpdGVtX2lkIG9yICIiKSwgcXVvdGU9VHJ1ZSkKICAgIHJldHVybiAoCiAgICAgICAgZic8dGctYnV0dG9uLXJvdyBhbGlnbj0iY2VudGVyIj4nCiAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJzdWNjZXNzIiBkYXRhPSJxdWV1ZXBsYXl8e2NoYXRfaWR9fHtzYWZlX2l0ZW1faWR9Ij7jhaTjhaTjhaTjhaRQyp/htIDKjyBO4bSP4bSh44Wk44Wk44Wk44WkPC90Zy1idXR0b24+JwogICAgICAgIGYnPC90Zy1idXR0b24tcm93PicKICAgICAgICBmJzx0Zy1idXR0b24tcm93IGFsaWduPSJjZW50ZXIiPicKICAgICAgICBmJzx0Zy1idXR0b24gdHlwZT0iY2FsbGJhY2tfZGF0YSIgc3R5bGU9ImRhbmdlciIgZGF0YT0iY29udHJvbHMgc3RvcCB7Y2hhdF9pZH0iPuOFpOOFpFPhtJvhtI/htJjjhaTjhaQ8L3RnLWJ1dHRvbj4nCiAgICAgICAgZic8dGctYnV0dG9uIHR5cGU9ImNhbGxiYWNrX2RhdGEiIHN0eWxlPSJwcmltYXJ5IiBkYXRhPSJjb250cm9scyBjbG9zZSB7Y2hhdF9pZH0iPuOFpOOFpEPKn+G0j3PhtIfjhaTjhaQ8L3RnLWJ1dHRvbj4nCiAgICAgICAgZic8L3RnLWJ1dHRvbi1yb3c+JwogICAgKQoKCmRlZiBxdWV1ZV9yaWNoX2h0bWwoYmFzZV9odG1sOiBzdHIsIGNoYXRfaWQ6IGludCwgaXRlbV9pZDogc3RyID0gIiIpIC0+IHN0cjoKICAgICIiIkZvcm1hdCB0aGUgcXVldWVkLXNvbmcgbWVzc2FnZSBsaWtlIHRoZSBtYWluIFJpY2ggUGxheWVyIGNhcmQuCgogICAgVGhlIHF1ZXVlIG1lc3NhZ2Uga2VlcHMgdGhlIGV4aXN0aW5nIGxvY2FsaXplZCB0aXRsZS9kdXJhdGlvbi9yZXF1ZXN0ZXIKICAgIHRleHQsIGJ1dCBzZXBhcmF0ZXMgaXQgaW50byBjbGVhbiBSaWNoIE1lc3NhZ2UgcXVvdGUgYmxvY2tzIGluc3RlYWQgb2YKICAgIHNob3dpbmcgYWxsIGZpZWxkcyBhcyBvbmUgbG9uZyBwYXJhZ3JhcGguIENvbnRyb2xzIHJlbWFpbiBpbnNpZGUgdGhlIGNhcmQuCiAgICAiIiIKICAgIGNsZWFuID0gX2NsZWFuX2Jhc2VfaHRtbChiYXNlX2h0bWwpCiAgICBsaW5lcyA9IFtsaW5lLnN0cmlwKCkgZm9yIGxpbmUgaW4gY2xlYW4uc3BsaXRsaW5lcygpIGlmIGxpbmUuc3RyaXAoKV0KCiAgICBpZiBsZW4obGluZXMpID49IDQ6CiAgICAgICAgaGVhZGVyID0gbGluZXNbMF0KICAgICAgICBkZXRhaWxzID0gIjxicj4iLmpvaW4obGluZXNbMTo0XSkKICAgICAgICAjIEtlZXAgYW55IGV4dHJhIGxvY2FsaXplZCBjb250ZW50IGluc3RlYWQgb2Ygc2lsZW50bHkgZHJvcHBpbmcgaXQuCiAgICAgICAgaWYgbGVuKGxpbmVzKSA+IDQ6CiAgICAgICAgICAgIGRldGFpbHMgKz0gIjxicj4iICsgIjxicj4iLmpvaW4obGluZXNbNDpdKQogICAgICAgIGZvcm1hdHRlZCA9ICgKICAgICAgICAgICAgZic8YmxvY2txdW90ZT57aGVhZGVyfTwvYmxvY2txdW90ZT4nCiAgICAgICAgICAgIGYnPGJsb2NrcXVvdGU+e2RldGFpbHN9PC9ibG9ja3F1b3RlPicKICAgICAgICApCiAgICBlbHNlOgogICAgICAgICMgU2FmZSBmYWxsYmFjayBmb3IgYSBkaWZmZXJlbnQgbG9jYWxlL3RlbXBsYXRlLgogICAgICAgIGZvcm1hdHRlZCA9IGYnPGJsb2NrcXVvdGU+e2NsZWFufTwvYmxvY2txdW90ZT4nCgogICAgcmV0dXJuIGYie2Zvcm1hdHRlZH1cblxue3F1ZXVlX2NvbnRyb2xzX2h0bWwoY2hhdF9pZCwgaXRlbV9pZCl9IgoKCmFzeW5jIGRlZiBlZGl0X3F1ZXVlX3JpY2hfbWVzc2FnZShtZXNzYWdlLCB0ZXh0OiBzdHIsIGNoYXRfaWQ6IGludCwgaXRlbV9pZDogc3RyID0gIiIpIC0+IGJvb2w6CiAgICAiIiJSZXBsYWNlIHRoZSB0ZW1wb3JhcnkgL3BsYXkgbWVzc2FnZSB3aXRoIGEgcmVhbCBSaWNoIE1lc3NhZ2UuCgogICAgUXVldWUgY29udHJvbHMgbXVzdCBiZSBjcmVhdGVkIGJ5IGBgc2VuZFJpY2hNZXNzYWdlYGAgaXRzZWxmLiBFZGl0aW5nIGEKICAgIG5vcm1hbCBQeXJvZ3JhbSB0ZXh0IG1lc3NhZ2UgaW50byBhIFJpY2ggTWVzc2FnZSBjYW4gZGlzcGxheSB0aGUgYnV0dG9ucwogICAgYnV0IGRvZXMgbm90IHJlbGlhYmx5IHByZXNlcnZlIHRoZWlyIGNhbGxiYWNrIGV2ZW50cy4gQ3JlYXRpbmcgYSBmcmVzaAogICAgUmljaCBNZXNzYWdlIGdpdmVzIHRoZSBxdWV1ZSBjb250cm9scyB0aGUgc2FtZSBjYWxsYmFjayBwYXRoIGFzIHRoZSBtYWluCiAgICBwbGF5ZXIgYnV0dG9ucy4KICAgICIiIgogICAgdHJ5OgogICAgICAgIHJpY2ggPSB7Imh0bWwiOiBxdWV1ZV9yaWNoX2h0bWwodGV4dCwgaW50KGNoYXRfaWQpLCBpdGVtX2lkKX0KICAgICAgICByZXN1bHQgPSBhd2FpdCBfcmVxdWVzdCgKICAgICAgICAgICAgInNlbmRSaWNoTWVzc2FnZSIsCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJjaGF0X2lkIjogaW50KGNoYXRfaWQpLAogICAgICAgICAgICAgICAgInJpY2hfbWVzc2FnZSI6IHJpY2gsCiAgICAgICAgICAgIH0sCiAgICAgICAgKQogICAgICAgICMgUmVtb3ZlIHRoZSB0ZW1wb3Jhcnkgc2VhcmNoaW5nL3N0YXR1cyBtZXNzYWdlIG9ubHkgYWZ0ZXIgdGhlIFJpY2gKICAgICAgICAjIE1lc3NhZ2Ugd2FzIHN1Y2Nlc3NmdWxseSBjcmVhdGVkLgogICAgICAgIHRyeToKICAgICAgICAgICAgYXdhaXQgX3JlcXVlc3QoCiAgICAgICAgICAgICAgICAiZGVsZXRlTWVzc2FnZSIsCiAgICAgICAgICAgICAgICB7ImNoYXRfaWQiOiBpbnQoY2hhdF9pZCksICJtZXNzYWdlX2lkIjogaW50KG1lc3NhZ2UuaWQpfSwKICAgICAgICAgICAgKQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgIHBhc3MKICAgICAgICBtc2cgPSByZXN1bHQuZ2V0KCJyZXN1bHQiKSBvciB7fQogICAgICAgIG1pZCA9IG1zZy5nZXQoIm1lc3NhZ2VfaWQiKQogICAgICAgIGlmIG1pZDoKICAgICAgICAgICAgX2NhY2hlX21lc3NhZ2VfbWVkaWEoaW50KGNoYXRfaWQpLCBpbnQobWlkKSwgcmVzdWx0LCBOb25lKQogICAgICAgIHJldHVybiBUcnVlCiAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgIHJldHVybiBGYWxzZQoKYXN5bmMgZGVmIHNlbmRfcmljaF9tZXNzYWdlKGNoYXRfaWQ6IGludCwgdGV4dDogc3RyLCByZXBseV9tYXJrdXA9Tm9uZSwgcGhvdG89Tm9uZSwgbWVkaWE9Tm9uZSwgcmVwbHlfdG9fbWVzc2FnZV9pZD1Ob25lLCAqKmt3YXJncyk6CiAgICAiIiJCYWNrd2FyZC1jb21wYXRpYmxlIFJpY2ggTWVzc2FnZSBzZW5kZXIgdXNlZCBieSBsZWdhY3kgcGx1Z2lucy4KCiAgICBPbGRlciBwbHVnaW5zIGltcG9ydCBgYHNlbmRfcmljaF9tZXNzYWdlYGA7IGtlZXAgdGhhdCBBUEkgbWFwcGVkIHRvIHRoZQogICAgY3VycmVudCBwbGF5ZXIgc2VuZGVyIHNvIHN0YXJ0dXAgZG9lcyBub3QgZmFpbCBhZnRlciB0aGUgUmljaCBQbGF5ZXIgcmVmYWN0b3IuCiAgICAiIiIKICAgIHJldHVybiBhd2FpdCBzZW5kX3BsYXllcigKICAgICAgICBjaGF0X2lkLAogICAgICAgIHRleHQsCiAgICAgICAgcGhvdG89cGhvdG8sCiAgICAgICAgbWVkaWE9bWVkaWEsCiAgICAgICAgcmVwbHlfdG9fbWVzc2FnZV9pZD1yZXBseV90b19tZXNzYWdlX2lkLAogICAgICAgICoqa3dhcmdzLAogICAgKQphc3luYyBkZWYgZWRpdF9wbGF5ZXJfbWVzc2FnZShjaGF0X2lkLCBtZXNzYWdlX2lkLCBiYXNlX2h0bWwsIG1lZGlhLCAqYXJncywgKiprd2FyZ3MpOgogICAgcmV0dXJuIGF3YWl0IGVkaXRfcGxheWVyKGNoYXRfaWQsIG1lc3NhZ2VfaWQsIGJhc2VfaHRtbCwgbWVkaWEsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGltZXI9a3dhcmdzLmdldCgidGltZXIiKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwbGF5aW5nPWt3YXJncy5nZXQoInBsYXlpbmciLCBUcnVlKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZW1vdmU9a3dhcmdzLmdldCgicmVtb3ZlIiwgRmFsc2UpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBob3RvPWt3YXJncy5nZXQoInBob3RvIikpCg=='))
+import html
+import json
+import os
+import re
+import time
+import urllib.parse
+from typing import Optional
+import aiohttp
+
+from Elevenyts import config
+
+_PLAYER_PHOTOS: dict[tuple[int, int], str] = {}
+_PLAYER_MEDIA: dict[tuple[int, int], str] = {}
+_PLAYER_LOCKS: dict[tuple[int, int], object] = {}
+_PLAYER_AUTOPLAY: dict[int, bool] = {}
+
+
+def _api(method: str) -> str:
+    return f"https://api.telegram.org/bot{config.BOT_TOKEN}/{method}"
+
+
+def _valid_http_url(value) -> bool:
+    if not value:
+        return False
+    try:
+        p = urllib.parse.urlsplit(str(value).strip())
+        return p.scheme in ("http", "https") and bool(p.netloc) and (p.port is None or 1 <= p.port <= 65535)
+    except (ValueError, TypeError):
+        return False
+
+
+def _youtube_thumb(media) -> Optional[str]:
+    vid = str(getattr(media, "id", "") or "")
+    if re.fullmatch(r"[A-Za-z0-9_-]{6,20}", vid):
+        return f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg"
+    return None
+
+
+def _time(sec: int, duration: int) -> str:
+    sec = max(0, int(sec or 0))
+    return time.strftime("%H:%M:%S" if duration >= 3600 else "%M:%S", time.gmtime(sec))
+
+
+def progress_text(media, timer: Optional[str] = None) -> str:
+    duration = int(getattr(media, "duration_sec", 0) or 0)
+    if duration <= 0:
+        return timer or "LIVE"
+    played = max(0, min(int(float(getattr(media, "time", 0) or 0)), duration))
+    n = 14
+    filled = int(round(n * played / duration))
+    bar = "━" * filled + "●" + "━" * (n - filled)
+    return f"{_time(played, duration)} {bar} {_time(duration, duration)}"
+
+
+def _clean_base_html(base_html: str) -> str:
+    # Preserve the bot's existing text, bold/italic/blockquote/links/etc.
+    # Only remove old Rich button rows so controls are generated exactly once.
+    text = base_html or ""
+    text = re.sub(r"<tg-button-row\b[^>]*>.*?</tg-button-row>", "", text, flags=re.I | re.S)
+    text = re.sub(r'<a\s+href=([^"\'>\s]+)>', r'<a href="\1">', text)
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+    return text
+
+
+def _styles(playing: bool):
+    phase = int(time.time() // 5) % 4 if playing else 0
+    palettes = (
+        ("success", "primary", "danger", "success"),
+        ("primary", "success", "success", "danger"),
+        ("danger", "primary", "success", "primary"),
+        ("success", "danger", "primary", "success"),
+    )
+    return palettes[phase]
+
+
+def controls_html(chat_id: int, media, *, timer: Optional[str] = None,
+                  playing: bool = True, remove: bool = False, queue_mode: bool = False,
+                  autoplay: bool = False) -> str:
+    if remove:
+        return ""
+
+    time_style, replay_style, state_style, queue_style = _styles(playing)
+    state = "pause" if playing else "resume"
+    label = "Pause" if playing else "Resume"
+    p = html.escape(progress_text(media, timer))
+
+    # Queue-message controls: match the existing queue keyboard, but render
+    # them inside the Rich Message itself instead of as a separate keyboard.
+    if queue_mode:
+        return (
+            f'<tg-button-row align="center">'
+            f'<tg-button type="callback_data" style="success" data="controls resume {chat_id}">▷</tg-button>'
+            f'<tg-button type="callback_data" style="primary" data="controls pause {chat_id}">∣ ∣</tg-button>'
+            f'<tg-button type="callback_data" style="primary" data="controls skip {chat_id}">>></tg-button>'
+            f'<tg-button type="callback_data" style="danger" data="controls stop {chat_id}">▣</tg-button>'
+            f'</tg-button-row>'
+            f'<tg-button-row align="center">'
+            f'<tg-button type="callback_data" style="danger" data="controls close {chat_id}">🗑</tg-button>'
+            f'</tg-button-row>'
+        )
+
+    # Exact requested player layout:
+    # 1) Time / progress
+    # 2) Pause, Replay, Shuffle, Skip
+    # 3) Loop, Close, Stop
+    # 4) Autoplay: ON/OFF
+    autoplay_label = "ㅤㅤㅤㅤAutoplay: ONㅤㅤㅤㅤ" if autoplay else "ㅤㅤㅤㅤAutoplay: OFFㅤㅤㅤㅤ"
+    autoplay_style = "success" if autoplay else "primary"
+    return (
+        f'<tg-button-row align="center">'
+        f'<tg-button type="callback_data" style="{time_style}" data="controls status {chat_id}">{p}</tg-button>'
+        f'</tg-button-row>'
+        f'<tg-button-row align="center">'
+        f'<tg-button type="callback_data" style="{state_style}" data="controls {state} {chat_id}">{label}</tg-button>'
+        f'<tg-button type="callback_data" style="{time_style}" data="controls replay {chat_id}">Replay</tg-button>'
+        f'<tg-button type="callback_data" style="{replay_style}" data="controls shuffle {chat_id}">Shuffle</tg-button>'
+        f'<tg-button type="callback_data" style="{queue_style}" data="controls skip {chat_id}">Skip</tg-button>'
+        f'</tg-button-row>'
+        f'<tg-button-row align="center">'
+        f'<tg-button type="callback_data" style="{queue_style}" data="controls loop {chat_id}">Loop</tg-button>'
+        f'<tg-button type="callback_data" style="primary" data="controls close {chat_id}">Close</tg-button>'
+        f'<tg-button type="callback_data" style="danger" data="controls stop {chat_id}">Stop</tg-button>'
+        f'</tg-button-row>'
+        f'<tg-button-row align="center">'
+        f'<tg-button type="callback_data" style="{autoplay_style}" data="controls autoplay {chat_id}">{autoplay_label}</tg-button>'
+        f'</tg-button-row>'
+    )
+
+
+def _format_player_card(base_html: str) -> str:
+    """Arrange the current-playing card like the queue card.
+
+    Layout:
+      1. Header/status line in its own quote block.
+      2. Title, duration and requester in one details block.
+      3. Any remaining footer/powered-by content in its own block.
+
+    Existing blockquote wrappers are removed first so we never create nested
+    quote cards when a legacy template already contains them.
+    """
+    clean = _clean_base_html(base_html)
+    clean = re.sub(r"</?blockquote\b[^>]*>", "", clean, flags=re.I)
+    clean = re.sub(r"\n{3,}", "\n\n", clean).strip()
+    lines = [line.strip() for line in clean.splitlines() if line.strip()]
+
+    if len(lines) >= 5:
+        header = lines[0]
+        details = "<br>".join(lines[1:4])
+        footer = "<br>".join(lines[4:])
+        return (
+            f'<blockquote>{header}</blockquote>'
+            f'<blockquote>{details}</blockquote>'
+            f'<blockquote>{footer}</blockquote>'
+        )
+    if len(lines) >= 2:
+        header = lines[0]
+        details = "<br>".join(lines[1:])
+        return f'<blockquote>{header}</blockquote><blockquote>{details}</blockquote>'
+    return f'<blockquote>{clean}</blockquote>' if clean else ""
+
+
+def rich_html(base_html: str, chat_id: int, media, *, timer=None,
+              playing=True, remove=False, queue_mode=False, autoplay=False) -> str:
+    clean = _format_player_card(base_html)
+    if remove:
+        return clean
+    return f"{clean}\n\n{controls_html(chat_id, media, timer=timer, playing=playing, queue_mode=queue_mode, autoplay=autoplay)}"
+
+
+async def _request(method: str, data: dict, file_path: Optional[str] = None) -> dict:
+    timeout = aiohttp.ClientTimeout(total=90)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
+        if file_path and os.path.isfile(file_path):
+            form = aiohttp.FormData()
+            for k, v in data.items():
+                form.add_field(k, json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else str(v))
+            with open(file_path, "rb") as fp:
+                form.add_field("player_cover", fp, filename=os.path.basename(file_path), content_type="image/jpeg")
+                async with session.post(_api(method), data=form) as r:
+                    result = await r.json(content_type=None)
+        else:
+            async with session.post(_api(method), json=data) as r:
+                result = await r.json(content_type=None)
+    if not result.get("ok"):
+        raise RuntimeError(result.get("description", f"Telegram {method} failed"))
+    return result
+
+
+def _photo_source(chat_id, message_id, media, photo=None):
+    # Prefer Telegram's already-uploaded photo file_id. This is the key to
+    # keeping the cover attached when the Rich Message is edited repeatedly.
+    cached_file_id = _PLAYER_PHOTOS.get((chat_id, message_id))
+    if cached_file_id:
+        return cached_file_id
+    cached = _PLAYER_MEDIA.get((chat_id, message_id))
+    if cached:
+        return cached
+    if _valid_http_url(photo):
+        return str(photo).strip()
+    thumb = getattr(media, "thumbnail", None)
+    if _valid_http_url(thumb):
+        return str(thumb).strip()
+    return _youtube_thumb(media)
+
+
+def _cache_message_media(chat_id, message_id, result, fallback):
+    try:
+        msg = result.get("result") or {}
+        photos = msg.get("photo") or []
+        if photos:
+            fid = photos[-1].get("file_id")
+            if fid:
+                _PLAYER_PHOTOS[(chat_id, message_id)] = fid
+    except Exception:
+        pass
+    if fallback:
+        _PLAYER_MEDIA[(chat_id, message_id)] = fallback
+
+
+async def send_player(chat_id: int, base_html: str, photo=None, media=None, reply_to_message_id=None, *, playing=True, queue_mode=False, autoplay=None, **kwargs) -> int:
+    if autoplay is None:
+        autoplay = bool(_PLAYER_AUTOPLAY.get(chat_id, False))
+    else:
+        autoplay = bool(autoplay)
+        _PLAYER_AUTOPLAY[chat_id] = autoplay
+    player_html = rich_html(base_html, chat_id, media, playing=playing, queue_mode=queue_mode, autoplay=autoplay)
+    ref = _photo_source(chat_id, 0, media, photo)
+    rich = {"html": player_html}
+    if ref:
+        rich["html"] = f'<img src="tg://photo?id=player_cover"/>\n{player_html}'
+        rich["media"] = [{"id": "player_cover", "media": {"type": "photo", "media": ref}}]
+    data = {"chat_id": chat_id, "rich_message": rich}
+    if reply_to_message_id:
+        data["reply_parameters"] = {"message_id": int(reply_to_message_id)}
+    result = await _request("sendRichMessage", data)
+    msg = result["result"]
+    mid = int(msg["message_id"])
+    _cache_message_media(chat_id, mid, result, ref)
+    return mid
+
+
+async def edit_player(chat_id: int, message_id: int, base_html: str, media, *, timer=None,
+                      playing=True, remove=False, photo=None, autoplay=None) -> bool:
+    key = (chat_id, message_id)
+    if autoplay is None:
+        autoplay = bool(_PLAYER_AUTOPLAY.get(chat_id, False))
+    else:
+        autoplay = bool(autoplay)
+        _PLAYER_AUTOPLAY[chat_id] = autoplay
+    if remove:
+        try:
+            await _request("deleteMessage", {"chat_id": chat_id, "message_id": message_id})
+        except Exception:
+            return False
+        _PLAYER_PHOTOS.pop(key, None)
+        _PLAYER_MEDIA.pop(key, None)
+        _PLAYER_AUTOPLAY.pop(chat_id, None)
+        return True
+
+    lock = _PLAYER_LOCKS.get(key)
+    if lock is None:
+        import asyncio
+        lock = asyncio.Lock()
+        _PLAYER_LOCKS[key] = lock
+
+    async with lock:
+        ref = _photo_source(chat_id, message_id, media, photo)
+        body = rich_html(base_html, chat_id, media, timer=timer, playing=playing, autoplay=autoplay)
+        rich = {"html": body}
+        if ref:
+            rich["html"] = f'<img src="tg://photo?id=player_cover"/>\n{body}'
+            rich["media"] = [{"id": "player_cover", "media": {"type": "photo", "media": ref}}]
+        try:
+            result = await _request("editMessageText", {
+                "chat_id": chat_id,
+                "message_id": message_id,
+                "rich_message": rich,
+            })
+            if isinstance(result, dict):
+                _cache_message_media(chat_id, message_id, result, ref)
+            elif ref:
+                _PLAYER_MEDIA[key] = ref
+            return True
+        except Exception as e:
+            if "MESSAGE_NOT_MODIFIED" in str(e):
+                return True
+            # If an edit without media somehow happened, immediately retry
+            # once with the cached Telegram photo/file reference.
+            cached = _PLAYER_PHOTOS.get(key) or _PLAYER_MEDIA.get(key)
+            if cached and cached != ref:
+                try:
+                    rich["html"] = f'<img src="tg://photo?id=player_cover"/>\n{body}'
+                    rich["media"] = [{"id": "player_cover", "media": {"type": "photo", "media": cached}}]
+                    result = await _request("editMessageText", {
+                        "chat_id": chat_id,
+                        "message_id": message_id,
+                        "rich_message": rich,
+                    })
+                    return True
+                except Exception:
+                    pass
+            return False
+
+
+async def edit_rich_message(message, text, markup=None, photo_file_id=None, **kwargs):
+    chat_id = int(message.chat.id)
+    message_id = int(message.id)
+    media = kwargs.get("media")
+    if media is None:
+        try:
+            from Elevenyts import queue
+            media = queue.get_current(chat_id)
+        except Exception:
+            media = None
+    if media is not None:
+        return await edit_player(chat_id, message_id, text, media,
+                                 timer=kwargs.get("timer"),
+                                 playing=kwargs.get("playing", True),
+                                 remove=kwargs.get("remove", False),
+                                 photo=photo_file_id)
+    return False
+
+
+
+
+
+def queue_controls_html(chat_id: int, item_id: str) -> str:
+    """Controls for a queued song.
+
+    Play Now occupies a full row. Stop and Close share the second row.
+    Play Now carries the queued item's ID so the callback can promote that
+    exact song without changing the relative order of the other waiting songs.
+    """
+    safe_item_id = html.escape(str(item_id or ""), quote=True)
+    return (
+        f'<tg-button-row align="center">'
+        f'<tg-button type="callback_data" style="success" data="queueplay|{chat_id}|{safe_item_id}">ㅤㅤㅤㅤPʟᴀʏ Nᴏᴡㅤㅤㅤㅤ</tg-button>'
+        f'</tg-button-row>'
+        f'<tg-button-row align="center">'
+        f'<tg-button type="callback_data" style="danger" data="controls stop {chat_id}">ㅤㅤSᴛᴏᴘㅤㅤ</tg-button>'
+        f'<tg-button type="callback_data" style="primary" data="controls close {chat_id}">ㅤㅤCʟᴏsᴇㅤㅤ</tg-button>'
+        f'</tg-button-row>'
+    )
+
+
+def queue_rich_html(base_html: str, chat_id: int, item_id: str = "") -> str:
+    """Format the queued-song message like the main Rich Player card.
+
+    The queue message keeps the existing localized title/duration/requester
+    text, but separates it into clean Rich Message quote blocks instead of
+    showing all fields as one long paragraph. Controls remain inside the card.
+    """
+    clean = _clean_base_html(base_html)
+    lines = [line.strip() for line in clean.splitlines() if line.strip()]
+
+    if len(lines) >= 4:
+        header = lines[0]
+        details = "<br>".join(lines[1:4])
+        # Keep any extra localized content instead of silently dropping it.
+        if len(lines) > 4:
+            details += "<br>" + "<br>".join(lines[4:])
+        formatted = (
+            f'<blockquote>{header}</blockquote>'
+            f'<blockquote>{details}</blockquote>'
+        )
+    else:
+        # Safe fallback for a different locale/template.
+        formatted = f'<blockquote>{clean}</blockquote>'
+
+    return f"{formatted}\n\n{queue_controls_html(chat_id, item_id)}"
+
+
+async def edit_queue_rich_message(message, text: str, chat_id: int, item_id: str = "") -> bool:
+    """Replace the temporary /play message with a real Rich Message.
+
+    Queue controls must be created by ``sendRichMessage`` itself. Editing a
+    normal Pyrogram text message into a Rich Message can display the buttons
+    but does not reliably preserve their callback events. Creating a fresh
+    Rich Message gives the queue controls the same callback path as the main
+    player buttons.
+    """
+    try:
+        rich = {"html": queue_rich_html(text, int(chat_id), item_id)}
+        result = await _request(
+            "sendRichMessage",
+            {
+                "chat_id": int(chat_id),
+                "rich_message": rich,
+            },
+        )
+        # Remove the temporary searching/status message only after the Rich
+        # Message was successfully created.
+        try:
+            await _request(
+                "deleteMessage",
+                {"chat_id": int(chat_id), "message_id": int(message.id)},
+            )
+        except Exception:
+            pass
+        msg = result.get("result") or {}
+        mid = msg.get("message_id")
+        if mid:
+            _cache_message_media(int(chat_id), int(mid), result, None)
+        return True
+    except Exception:
+        return False
+
+async def send_rich_message(chat_id: int, text: str, reply_markup=None, photo=None, media=None, reply_to_message_id=None, **kwargs):
+    """Backward-compatible Rich Message sender used by legacy plugins.
+
+    Older plugins import ``send_rich_message``; keep that API mapped to the
+    current player sender so startup does not fail after the Rich Player refactor.
+    """
+    return await send_player(
+        chat_id,
+        text,
+        photo=photo,
+        media=media,
+        reply_to_message_id=reply_to_message_id,
+        **kwargs,
+    )
+async def edit_player_message(chat_id, message_id, base_html, media, *args, **kwargs):
+    return await edit_player(chat_id, message_id, base_html, media,
+                             timer=kwargs.get("timer"),
+                             playing=kwargs.get("playing", True),
+                             remove=kwargs.get("remove", False),
+                             photo=kwargs.get("photo"))
