@@ -16,6 +16,7 @@
 import asyncio
 import os
 import re
+import shutil
 import subprocess
 import time
 import uuid
@@ -174,6 +175,113 @@ async def _sticker_to_jpeg(client, sticker_file_id: str) -> Optional[str]:
                 pass
 
 
+async def _sticker_to_mp4(client, sticker) -> Optional[str]:
+    """Convert animated TGS or video WEBM sticker to an MP4 and cache its Telegram file_id.
+
+    The converted video is uploaded to Saved Messages once, then the resulting file_id
+    is stored in the AFK entry. Future AFK/welcome-back messages can attach captions
+    directly to the video instead of sending a separate text message.
+    """
+    token = uuid.uuid4().hex
+    base = os.path.join(TMP_DIR, f"stk_{token}")
+    downloaded = None
+    input_path = None
+    gif_path = base + ".gif"
+    mp4_path = base + ".mp4"
+    uploaded_message = None
+
+    try:
+        downloaded = await client.download_media(sticker.file_id, file_name=base)
+        if not downloaded or not os.path.exists(downloaded):
+            return None
+
+        is_animated = bool(getattr(sticker, "is_animated", False))
+        is_video = bool(getattr(sticker, "is_video", False))
+        if not is_animated and not is_video:
+            return None
+
+        suffix = ".tgs" if is_animated else ".webm"
+        input_path = base + suffix
+        if os.path.abspath(downloaded) != os.path.abspath(input_path):
+            shutil.copyfile(downloaded, input_path)
+
+        source_path = input_path
+        if is_animated:
+            converter = shutil.which("lottie_convert.py")
+            if not converter:
+                # The lottie package installs this command in the Python environment.
+                converter = "lottie_convert.py"
+            try:
+                result = await asyncio.to_thread(
+                    subprocess.run,
+                    [converter, input_path, gif_path],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    timeout=90,
+                )
+                if result.returncode != 0 or not os.path.exists(gif_path):
+                    logger.warning("AFK TGS sticker conversion failed; lottie_convert.py returned %s", result.returncode)
+                    return None
+                source_path = gif_path
+            except Exception as exc:
+                logger.warning("AFK TGS sticker conversion unavailable: %s", exc)
+                return None
+
+        ffmpeg_bin = shutil.which("ffmpeg")
+        if not ffmpeg_bin:
+            try:
+                import imageio_ffmpeg
+                ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
+            except Exception:
+                ffmpeg_bin = "ffmpeg"
+
+        try:
+            result = await asyncio.to_thread(
+                subprocess.run,
+                [
+                    ffmpeg_bin, "-y", "-i", source_path,
+                    "-vf", "fps=30,scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p",
+                    "-t", "15", "-an", "-c:v", "libx264",
+                    "-movflags", "+faststart", mp4_path,
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=120,
+            )
+            if result.returncode != 0 or not os.path.exists(mp4_path) or os.path.getsize(mp4_path) == 0:
+                logger.warning("AFK sticker FFmpeg conversion failed with return code %s", result.returncode)
+                return None
+        except Exception as exc:
+            logger.warning("AFK sticker FFmpeg conversion failed: %s", exc)
+            return None
+
+        # Store the converted file in Telegram once so the database can keep a reusable file_id.
+        uploaded_message = await client.send_video(
+            chat_id="me",
+            video=mp4_path,
+            supports_streaming=True,
+            disable_notification=True,
+        )
+        if not uploaded_message or not getattr(uploaded_message, "video", None):
+            return None
+        file_id = uploaded_message.video.file_id
+        try:
+            await uploaded_message.delete()
+        except Exception:
+            pass
+        return file_id
+    except Exception as exc:
+        logger.warning("AFK animated/video sticker conversion failed: %s", exc)
+        return None
+    finally:
+        for path in (downloaded, input_path, gif_path, mp4_path):
+            try:
+                if path and os.path.exists(path):
+                    os.remove(path)
+            except Exception:
+                pass
+
+
 async def _extract_afk_media(client, message: Message) -> Optional[str]:
     candidates = [message]
     if message.reply_to_message:
@@ -313,9 +421,18 @@ async def _extract_media_data(message: Message) -> Dict[str, Any]:
     if message.voice:
         return {"media_type": "voice", "media_file_id": message.voice.file_id, "caption": message.caption or ""}
     if message.sticker:
-        converted = await _sticker_to_jpeg(app, message.sticker.file_id)
+        sticker = message.sticker
+        if getattr(sticker, "is_animated", False) or getattr(sticker, "is_video", False):
+            converted_video = await _sticker_to_mp4(app, sticker)
+            if converted_video:
+                return {"media_type": "video", "media_file_id": converted_video, "caption": message.caption or ""}
+            # If conversion dependencies are unavailable, retain the original sticker
+            # rather than losing the AFK media completely.
+            return {"media_type": "sticker", "media_file_id": sticker.file_id, "caption": message.caption or ""}
+        converted = await _sticker_to_jpeg(app, sticker.file_id)
         if converted:
             return {"media_type": "photo", "media_file_id": converted, "caption": message.caption or ""}
+        return {"media_type": "sticker", "media_file_id": sticker.file_id, "caption": message.caption or ""}
     if message.document and not getattr(message.document, "mime_type", "") == "image/webp":
         return {"media_type": "document", "media_file_id": message.document.file_id, "caption": message.caption or ""}
     if message.text or message.caption:
@@ -340,6 +457,11 @@ async def _send_afk_media(chat_id: int, reply_to: int, media_payload: Dict[str, 
         return await _safe_send(app.send_voice, chat_id=chat_id, voice=media_file_id, caption=caption, parse_mode=ParseMode.HTML, reply_to_message_id=reply_to)
     if media_type == "document":
         return await _safe_send(app.send_document, chat_id=chat_id, document=media_file_id, caption=caption, parse_mode=ParseMode.HTML, reply_to_message_id=reply_to)
+    if media_type == "sticker":
+        sent = await _safe_send(app.send_sticker, chat_id=chat_id, sticker=media_file_id, reply_to_message_id=reply_to)
+        if sent and caption:
+            await _send_text_message(chat_id, caption, sent.id)
+        return sent
     return await _send_text_message(chat_id, caption or "", reply_to)
 
 
