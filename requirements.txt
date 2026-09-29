@@ -25,7 +25,7 @@ python-dotenv~=1.2.1
 yt-dlp[default]>=2026.3.3
 ffmpeg
 
-# Bundled FFmpeg fallback for converting Telegram sticker media to captioned videos
+# Bundled FFmpeg fallback for converting Telegram sticker media to captioned uploads
 imageio-ffmpeg>=0.6.0
-# TGS animated Telegram sticker conversion CLI
+# Converts animated TGS Telegram stickers before MP4 upload
 lottie>=0.7.2
