@@ -1,5 +1,6 @@
 # ==========================================================
-# VelocityBots — Daily Couple Shipping + Couple PFP
+# VelocityBots — Daily Couple Shipping
+# Standalone group plugin for /shipping
 # ==========================================================
 
 import hashlib
@@ -14,10 +15,10 @@ from Elevenyts import app, db
 
 
 SHIPPING_COLLECTION = "daily_shipping"
-FONT_PATH = os.path.join(os.path.dirname(__file__), "..", "helpers", "Raleway-Bold.ttf")
 
 
 def _seeded_score(chat_id: int, user_a: int, user_b: int, stamp: str) -> int:
+    """Stable compatibility score for the same daily couple."""
     raw = f"{chat_id}:{min(user_a, user_b)}:{max(user_a, user_b)}:{stamp}"
     digest = hashlib.sha256(raw.encode()).hexdigest()
     return 50 + (int(digest[:8], 16) % 51)
@@ -50,6 +51,7 @@ def _mention(user: types.User) -> str:
 async def _get_eligible_members(chat_id: int) -> list[types.User]:
     members = []
     seen = set()
+
     try:
         async for member in app.get_chat_members(chat_id):
             user = member.user
@@ -61,6 +63,7 @@ async def _get_eligible_members(chat_id: int) -> list[types.User]:
             members.append(user)
     except Exception:
         return []
+
     return members
 
 
@@ -68,11 +71,15 @@ async def _load_active_ship(chat_id: int):
     doc = await db.db[SHIPPING_COLLECTION].find_one({"_id": chat_id})
     if not doc:
         return None
+
     expires = doc.get("expires_at")
     if not isinstance(expires, datetime):
         return None
+
     if expires > datetime.utcnow():
         return doc
+
+    # Expired ship: remove it so the next /shipping starts a fresh 24h cycle.
     try:
         await db.db[SHIPPING_COLLECTION].delete_one({"_id": chat_id})
     except Exception:
@@ -80,37 +87,32 @@ async def _load_active_ship(chat_id: int):
     return None
 
 
-
-async def _send_ship_text(message, first, second, score, tier, ship, verdict, expires):
-    caption = (
-        f"💘 <b>DAILY SHIP HAS ARRIVED!</b> 💘\n\n"
-        f"💞 {_mention(first)}  ×  {_mention(second)}\n\n"
-        f"💗 <b>Compatibility:</b> {score}%\n"
-        f"🏷️ <b>{tier}</b>\n"
-        f"✨ <b>Ship Name:</b> #{html.escape(ship)}\n\n"
-        f"🔮 <i>{html.escape(verdict)}</i>\n\n"
-        f"⏳ <b>This couple is locked for 24 hours.</b>\n"
-        f"🌙 Tomorrow, fate chooses again!"
-    )
-    await message.reply_text(caption, disable_web_page_preview=True)
-
-
-@app.on_message(filters.command("shipping") & filters.group & ~app.bl_users)
+@app.on_message(
+    filters.command("shipping") & filters.group & ~app.bl_users
+)
 async def daily_shipping(_, message: types.Message):
     chat_id = message.chat.id
-    if message.chat.type not in (ChatType.GROUP, ChatType.SUPERGROUP):
+
+    # The feature is deliberately group-only.
+    if message.chat.type not in (
+        ChatType.GROUP,
+        ChatType.SUPERGROUP,
+    ):
         return
 
     active = await _load_active_ship(chat_id)
+
     if active:
         expires = active["expires_at"]
         remaining = max(0, int((expires - datetime.utcnow()).total_seconds()))
         hours, rem = divmod(remaining, 3600)
         minutes = rem // 60
+
         first_name = html.escape(active.get("first_name", "Unknown"))
         second_name = html.escape(active.get("second_name", "Unknown"))
         score = int(active.get("score", 0))
         tier, _ = _tier(score)
+
         await message.reply_text(
             f"💘 <b>Today's Couple Is Already Locked!</b>\n\n"
             f"💞 {first_name} × {second_name}\n"
@@ -122,6 +124,7 @@ async def daily_shipping(_, message: types.Message):
         )
         return
 
+    # Fetch real members instead of relying on users who have used the bot.
     members = await _get_eligible_members(chat_id)
     if len(members) < 2:
         await message.reply_text(
@@ -130,12 +133,15 @@ async def daily_shipping(_, message: types.Message):
         )
         return
 
+    # Avoid making the same pair repeatedly when the random pool is small.
     random.shuffle(members)
     first, second = members[0], members[1]
+
     now = datetime.utcnow()
     stamp = now.strftime("%Y-%m-%d")
     score = _seeded_score(chat_id, first.id, second.id, stamp)
     tier, verdict = _tier(score)
+
     first_display = first.first_name or "Unknown"
     second_display = second.first_name or "Unknown"
     ship = _ship_name(first_display, second_display)
@@ -155,21 +161,32 @@ async def daily_shipping(_, message: types.Message):
         "expires_at": expires,
     }
 
+    # Atomic insert prevents two simultaneous /shipping commands
+    # from creating two different couples.
     try:
         await db.db[SHIPPING_COLLECTION].insert_one(doc)
     except Exception:
         active = await _load_active_ship(chat_id)
         if active:
-            # Another simultaneous command won the race. Keep the existing couple.
             await message.reply_text(
                 "💘 <b>Today's couple has just been chosen!</b>\n\n"
-                f"💞 {html.escape(active.get('first_name', 'Unknown'))} × {html.escape(active.get('second_name', 'Unknown'))}\n"
-                f"💗 Compatibility: <b>{int(active.get('score', 0))}%</b>\n"
-                f"🏷️ {_tier(int(active.get('score', 0)))[0]}\n\n"
+                f"💞 {_mention(first)} × {_mention(second)}\n"
+                f"💗 Compatibility: <b>{score}%</b>\n"
+                f"🏷️ {tier}\n\n"
                 "⏳ This ship lasts for 24 hours.",
                 disable_web_page_preview=True,
             )
             return
         raise
 
-    await _send_ship_text(message, first, second, score, tier, ship, verdict, expires)
+    await message.reply_text(
+        f"💘 <b>DAILY SHIP HAS ARRIVED!</b> 💘\n\n"
+        f"💞 {_mention(first)}  ×  {_mention(second)}\n\n"
+        f"💗 <b>Compatibility:</b> {score}%\n"
+        f"🏷️ <b>{tier}</b>\n"
+        f"✨ <b>Ship Name:</b> #{html.escape(ship)}\n\n"
+        f"🔮 <i>{html.escape(verdict)}</i>\n\n"
+        f"⏳ <b>This couple is locked for 24 hours.</b>\n"
+        f"🌙 Tomorrow, fate chooses again!",
+        disable_web_page_preview=True,
+    )
