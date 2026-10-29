@@ -28,7 +28,7 @@ from pyrogram.types import (
     Message,
 )
 
-from Elevenyts import app, config, db, logger
+from Elevenyts import app, config, db, logger, rich_player
 from ._textimg import draw_text
 
 # ─────────────────────────── PATHS ───────────────────────────
@@ -422,22 +422,61 @@ async def _send_welcome(client, update: ChatMemberUpdated, user) -> None:
             count=members,
         )
 
-        # Use normal Telegram inline buttons here. The base Juno bot does not
-        # provide Elevenyts.core.rich_buttons, so importing that module would
-        # prevent the entire Artistbots plugin package from loading.
-        reply_markup = InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton(BTN_VIEW, url=f"tg://user?id={user.id}")],
-                [InlineKeyboardButton(BTN_ADD, url=f"https://t.me/{app.username}?startgroup=true")],
-            ]
+        # Use the same Rich Message / Rich Button system as the music player.
+        # We first upload the rendered card to Telegram to obtain a reusable
+        # file_id, then send one Rich Message that contains the image + buttons.
+        rich_body = (
+            f'<img src="tg://photo?id=welcome_cover"/>\n'
+            f'<blockquote>{caption}</blockquote>\n'
+            f'<tg-button-row align="center">'
+            f'<tg-button type="url" style="primary" url="tg://user?id={user.id}">👤 {BTN_VIEW}</tg-button>'
+            f'</tg-button-row>'
+            f'<tg-button-row align="center">'
+            f'<tg-button type="url" style="success" url="https://t.me/{app.username}?startgroup=true">➕ {BTN_ADD}</tg-button>'
+            f'</tg-button-row>'
         )
 
+        temp = None
         try:
-            sent = await client.send_photo(
-                cid, img, caption=caption, reply_markup=reply_markup
+            temp = await client.send_photo(cid, img)
+            photos = getattr(temp, "photo", None)
+            file_id = getattr(photos, "file_id", None) if photos else None
+            if not file_id:
+                raise RuntimeError("Telegram did not return a welcome photo file_id")
+
+            result = await rich_player._request(
+                "sendRichMessage",
+                {
+                    "chat_id": cid,
+                    "rich_message": {
+                        "html": rich_body,
+                        "media": [{"id": "welcome_cover", "media": {"type": "photo", "media": file_id}}],
+                    },
+                },
             )
-        except TopicClosed:
-            return
+            if not result.get("ok"):
+                raise RuntimeError(result.get("description", "sendRichMessage failed"))
+            try:
+                await temp.delete()
+            except Exception:
+                pass
+            sent = result.get("result") or temp
+        except Exception as rich_error:
+            # Safe fallback: ordinary Telegram photo/buttons, so a Rich API
+            # failure never breaks the welcome system.
+            logger.warning(f"Welcome Rich Message failed in {cid}: {rich_error}")
+            if temp:
+                try:
+                    await temp.delete()
+                except Exception:
+                    pass
+            reply_markup = InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton(BTN_VIEW, url=f"tg://user?id={user.id}")],
+                    [InlineKeyboardButton(BTN_ADD, url=f"https://t.me/{app.username}?startgroup=true")],
+                ]
+            )
+            sent = await client.send_photo(cid, img, caption=caption, reply_markup=reply_markup)
 
         # keep only the last WELCOME_LIMIT welcome messages in the chat
         last_messages.setdefault(cid, []).append(sent)

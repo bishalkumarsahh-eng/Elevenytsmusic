@@ -28,6 +28,7 @@ from typing import Optional
 
 from pyrogram import filters
 from pyrogram.errors import FloodWait, RPCError
+from pyrogram.errors import MessageIdInvalid
 from pyrogram.file_id import FileId
 from pyrogram.raw import functions, types as raw
 from pyrogram.types import (
@@ -233,6 +234,18 @@ async def user_pack_count(user_id: int) -> int:
     return max(n, len(mem_packs.get(user_id, [])))
 
 
+
+
+async def safe_edit(status: Message, text: str, *, reply_markup=None, fallback_message: Message = None):
+    """Edit a progress/status message, falling back to a fresh reply if Telegram
+    says the old message id is invalid (for example after auto-delete)."""
+    try:
+        return await status.edit_text(text, reply_markup=reply_markup)
+    except MessageIdInvalid:
+        if fallback_message is not None:
+            return await fallback_message.reply_text(text, reply_markup=reply_markup)
+        raise
+
 def _progress_cb(msg: Message):
     last = {"t": 0.0}
 
@@ -242,7 +255,7 @@ def _progress_cb(msg: Message):
             return
         last["t"] = now
         try:
-            await msg.edit_text(f"⏳ <b>ᴄʀєᴧᴛɪηɢ ᴘᴧᴄᴋ...</b> <code>{done}/{total}</code>")
+            await safe_edit(msg, f"⏳ <b>ᴄʀєᴧᴛɪηɢ ᴘᴧᴄᴋ...</b> <code>{done}/{total}</code>")
         except FloodWait as e:
             await asyncio.sleep(int(e.value) + 1)
         except Exception:
@@ -302,11 +315,11 @@ async def kang_cmd(client, message: Message):
         sset = await _fetch_set(client, sticker.set_name)
     except Exception as e:
         logger.warning(f"kang get set failed: {e}")
-        return await status.edit_text(f"❌ <b>ᴄσυʟᴅη'ᴛ ʀєᴧᴅ ᴛʜє ᴘᴧᴄᴋ.</b>\n{friendly_error(e)}")
+        return await safe_edit(status, f"❌ <b>ᴄσυʟᴅη'ᴛ ʀєᴧᴅ ᴛʜє ᴘᴧᴄᴋ.</b>\n{friendly_error(e)}", fallback_message=message)
 
     docs = list(sset.documents or [])
     if not docs:
-        return await status.edit_text("❌ <b>ᴛʜᴧᴛ ᴘᴧᴄᴋ ɪs єϻᴘᴛʏ.</b>")
+        return await safe_edit(status, "❌ <b>ᴛʜᴧᴛ ᴘᴧᴄᴋ ɪs єϻᴘᴛʏ.</b>", fallback_message=message)
 
     emoji_of = _emoji_map(sset)
     items = [
@@ -325,7 +338,7 @@ async def kang_cmd(client, message: Message):
     title = pack_title(user, number)
     truncated = len(items) > MAX_STICKERS
 
-    await status.edit_text(f"⏳ <b>ᴄʀєᴧᴛɪηɢ ᴘᴧᴄᴋ...</b> <code>0/{min(len(items), MAX_STICKERS)}</code>")
+    await safe_edit(status, f"⏳ <b>ᴄʀєᴧᴛɪηɢ ᴘᴧᴄᴋ...</b> <code>0/{min(len(items), MAX_STICKERS)}</code>", fallback_message=message)
 
     try:
         short_name = await create_set(
@@ -339,7 +352,7 @@ async def kang_cmd(client, message: Message):
         )
     except Exception as e:
         logger.warning(f"kang create failed for {user.id}: {e}")
-        return await status.edit_text(f"❌ <b>ғᴧɪʟєᴅ ᴛσ ᴄʀєᴧᴛє ᴘᴧᴄᴋ.</b>\n{friendly_error(e)}")
+        return await safe_edit(status, f"❌ <b>ғᴧɪʟєᴅ ᴛσ ᴄʀєᴧᴛє ᴘᴧᴄᴋ.</b>\n{friendly_error(e)}", fallback_message=message)
 
     total = min(len(items), MAX_STICKERS)
     await save_pack(user.id, short_name, title, "kang", sticker_type(sticker), total)
@@ -351,4 +364,4 @@ async def kang_cmd(client, message: Message):
     )
     if truncated:
         text += f"\n⚠️ <i>ᴏηʟʏ ғɪʀsᴛ {MAX_STICKERS} sᴛɪᴄᴋєʀs ᴄᴧη ғɪᴛ ɪη ᴏηє ᴘᴧᴄᴋ.</i>"
-    await status.edit_text(text, reply_markup=link_markup(short_name))
+    await safe_edit(status, text, reply_markup=link_markup(short_name), fallback_message=message)
