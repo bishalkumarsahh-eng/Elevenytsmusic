@@ -29,3 +29,6 @@ ffmpeg
 imageio-ffmpeg>=0.6.0
 # Converts animated TGS Telegram stickers before MP4 upload
 lottie>=0.7.2
+
+# Font fallback used by the Juno X Music welcome-card renderer
+fonttools>=4.0
