@@ -40,17 +40,15 @@ FALLBACK_PIC = str(_BASE / "upic.png")
 BTN_VIEW = "ᴠɪєᴡ ϻєϻʙєʀ"
 BTN_ADD = "ᴧᴅᴅ ϻє ᴛσ ʏσυʀ ɢʀσυᴘ"
 
-CAPTION_TXT = """✨❄───✧ <b>ᴡᴇʟᴄᴏᴍᴇ</b> ✧───❄✨
-🥀 <b>{chat_title}</b> 🥀
-
-╔═══════════════════╗
-║ 👤 <b>Nᴀᴍᴇ</b> : {mention}
-║ 🆔 <b>Iᴅ</b> : <code>{uid}</code>
-║ 🔗 <b>Usᴇʀɴᴀᴍᴇ</b> : @{uname}
-║ 🌐 <b>Tᴏᴛᴀʟ Mᴇᴍʙᴇʀs</b> : {count}
-╚═══════════════════╝
-
-❄✦─────❅💖💖✦─────✦❄"""
+CAPTION_TXT = (
+    "✨❄️ <b>WELCOME</b> ❄️✨<br>"
+    "🌹 <b>{chat_title}</b> 🌹<br><br>"
+    "👤 <b>NAME:</b> {mention}<br>"
+    "🆔 <b>ID:</b> <code>{uid}</code><br>"
+    "🔗 <b>USERNAME:</b> @{uname}<br>"
+    "🌐 <b>TOTAL MEMBERS:</b> {count}<br><br>"
+    "❄️💖 <i>Enjoy the group and have fun!</i> 💖❄️"
+)
 
 # ─────────────────────── ANTI-SPAM SETTINGS ───────────────────────
 JOIN_THRESHOLD = 20   # joins inside TIME_WINDOW => treated as a raid
@@ -422,12 +420,14 @@ async def _send_welcome(client, update: ChatMemberUpdated, user) -> None:
             count=members,
         )
 
-        # Use the same Rich Message / Rich Button system as the music player.
-        # We first upload the rendered card to Telegram to obtain a reusable
-        # file_id, then send one Rich Message that contains the image + buttons.
+        # Send ONE Rich Message directly with the generated image file.
+        # Do not send a temporary photo to the group first: that caused two
+        # welcome photos to appear when the temporary message was not deleted
+        # quickly enough. The Rich Message API receives the local image as
+        # `player_cover` and uses it directly.
         rich_body = (
-            f'<img src="tg://photo?id=welcome_cover"/>\n'
-            f'<blockquote>{caption}</blockquote>\n'
+            f'<img src="tg://photo?id=player_cover"/><br>'
+            f'{caption}<br>'
             f'<tg-button-row align="center">'
             f'<tg-button type="url" style="primary" url="tg://user?id={user.id}">👤 {BTN_VIEW}</tg-button>'
             f'</tg-button-row>'
@@ -436,40 +436,27 @@ async def _send_welcome(client, update: ChatMemberUpdated, user) -> None:
             f'</tg-button-row>'
         )
 
-        temp = None
         try:
-            temp = await client.send_photo(cid, img)
-            photos = getattr(temp, "photo", None)
-            file_id = getattr(photos, "file_id", None) if photos else None
-            if not file_id:
-                raise RuntimeError("Telegram did not return a welcome photo file_id")
-
             result = await rich_player._request(
                 "sendRichMessage",
                 {
                     "chat_id": cid,
                     "rich_message": {
                         "html": rich_body,
-                        "media": [{"id": "welcome_cover", "media": {"type": "photo", "media": file_id}}],
+                        "media": [{
+                            "id": "player_cover",
+                            "media": {"type": "photo", "media": "attach://player_cover"},
+                        }],
                     },
                 },
+                file_path=img,
             )
-            if not result.get("ok"):
-                raise RuntimeError(result.get("description", "sendRichMessage failed"))
-            try:
-                await temp.delete()
-            except Exception:
-                pass
-            sent = result.get("result") or temp
+            sent = result.get("result")
+            if not sent:
+                raise RuntimeError("Rich Message API returned no message")
         except Exception as rich_error:
-            # Safe fallback: ordinary Telegram photo/buttons, so a Rich API
-            # failure never breaks the welcome system.
             logger.warning(f"Welcome Rich Message failed in {cid}: {rich_error}")
-            if temp:
-                try:
-                    await temp.delete()
-                except Exception:
-                    pass
+            # Fallback is a single normal photo with the same buttons.
             reply_markup = InlineKeyboardMarkup(
                 [
                     [InlineKeyboardButton(BTN_VIEW, url=f"tg://user?id={user.id}")],
