@@ -29,8 +29,6 @@ from pyrogram.types import (
 )
 
 from Elevenyts import app, config, db, logger
-from Elevenyts.core import rich_buttons
-
 from ._textimg import draw_text
 
 # ─────────────────────────── PATHS ───────────────────────────
@@ -424,10 +422,9 @@ async def _send_welcome(client, update: ChatMemberUpdated, user) -> None:
             count=members,
         )
 
-        # Use the bot's existing Rich Button system for this welcome message.
-        # Do not bypass it with a normal inline keyboard: Rich Buttons are sent
-        # directly as Telegram Rich Message HTML so the buttons render in the
-        # same system as the music player.
+        # Use normal Telegram inline buttons here. The base Juno bot does not
+        # provide Elevenyts.core.rich_buttons, so importing that module would
+        # prevent the entire Artistbots plugin package from loading.
         reply_markup = InlineKeyboardMarkup(
             [
                 [InlineKeyboardButton(BTN_VIEW, url=f"tg://user?id={user.id}")],
@@ -436,20 +433,9 @@ async def _send_welcome(client, update: ChatMemberUpdated, user) -> None:
         )
 
         try:
-            sent = await rich_buttons.send_rich_media(
-                cid,
-                caption,
-                reply_markup,
-                "photo",
-                img,
+            sent = await client.send_photo(
+                cid, img, caption=caption, reply_markup=reply_markup
             )
-            if not sent:
-                # Safety fallback if Telegram's Rich Message endpoint is unavailable.
-                sent = await client.send_photo(
-                    cid, img, caption=caption, reply_markup=reply_markup
-                )
-            else:
-                sent = sent.get("result", sent)
         except TopicClosed:
             return
 
