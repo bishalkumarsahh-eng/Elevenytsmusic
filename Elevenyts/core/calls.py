@@ -23,6 +23,7 @@ from pyrogram import enums, errors
 from pyrogram.errors import MessageIdInvalid
 from pyrogram.types import InputMediaPhoto, Message
 from pytgcalls import PyTgCalls, exceptions, types
+from pytgcalls import filters as call_filters
 from pytgcalls.pytgcalls_session import PyTgCallsSession
 
 from Elevenyts import app, config, db, lang, logger, preload, queue, userbot, yt
@@ -796,6 +797,17 @@ class TgCall(PyTgCalls):
 
     async def decorators(self, client: PyTgCalls) -> None:
         for client in self.clients:
+            # VC participant events for the optional /vclog system.
+            # The assistant must be connected to the voice chat to receive
+            # these PyTgCalls participant updates.
+            @client.on_update(call_filters.call_participant())
+            async def participant_handler(_, update: types.UpdatedGroupCallParticipant) -> None:
+                try:
+                    from Elevenyts.plugins.Artistbots.vclog import handle_participant
+                    await handle_participant(update)
+                except Exception as e:
+                    logger.warning(f"VC log participant handler failed: {e}", exc_info=True)
+
             @client.on_update()
             async def update_handler(_, update: types.Update) -> None:
                 if isinstance(update, types.StreamEnded):
